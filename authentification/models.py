@@ -54,7 +54,7 @@ class MyUserManager(UserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin, TrakingModel):
+class User(TrakingModel, AbstractBaseUser, PermissionsMixin):
     """
     An abstract base class implementing a fully featured User model with
     admin-compliant permissions.

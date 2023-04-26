@@ -139,7 +139,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None):
-        user = get_object_or_404(User, id=pk)
+        user = self.get_object()
         serializer = self.serializer_class(
             user,
             data=request.data,
