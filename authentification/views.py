@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from rest_framework.decorators import action
 from authentification.models import User
-from helpers.permission import HasManagerRole, IsUserOwner
+from helpers.permission import HasOWNERRole, IsUserOwner
 from helpers.utils import recover_email, check_token
 
 # Create your views here.
@@ -116,14 +116,19 @@ class CodeVerification(GenericAPIView):
 class UserViewSet(viewsets.ModelViewSet):
     # authentication_classes = ()
     permission_classes = (permissions.IsAuthenticated,
-                          HasManagerRole)
+                          HasOWNERRole)
 
     filter_backends = (filters.SearchFilter,)
 
     search_fields = ['id', 'first_name', 'last_name',
                      'role_name', 'added_by', 'email']
 
-    queryset = User.objects.all()
+    def get_queryset(self):
+        if self.request.user.role_name in ["ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER"]:
+            return User.objects.all()
+
+        return User.objects.exclude(role_name="ROLE_ADMIN").exclude(role_name="ROLE_OWNER")
+
     serializer_class = UserSerialiser
 
     def create(self, request):

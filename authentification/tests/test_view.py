@@ -165,7 +165,10 @@ class TestUserViews(TestCase):
         response = self.client.put(
             self.users_url+f'{self.user2.id}/',
             json.dumps({
-                "role_name": "ROLE_COLLECTOR"
+                "username": "jeanedoes",
+                "email": "jonhdoes@yahoo.fr",
+                "password": "casho 15",
+                "first_name": "jeane",
             }),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user.token}'},
             content_type="application/json"

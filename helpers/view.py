@@ -1,5 +1,4 @@
 from rest_framework import response, status
-from django.shortcuts import get_object_or_404
 
 
 class CreateUpdateMixin:
@@ -7,6 +6,17 @@ class CreateUpdateMixin:
     # Elle permet d'ajouter des fonctionnalités aux classes qui les étendent
 
     Object = None
+    detail_serializer_class = None
+
+    def get_queryset(self):
+        return self.Object.objects.all()
+
+    def get_serializer_class(self):
+        # Notre mixin détermine quel serializer à utiliser
+        # même si elle ne sait pas ce que c'est ni comment l'utiliser
+        if self.action == 'retrieve' and self.detail_serializer_class is not None:
+            return self.detail_serializer_class
+        return super().get_serializer_class()
 
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -19,7 +29,6 @@ class CreateUpdateMixin:
 
     def update(self, request, pk=None):
         object = self.get_object()
-        # object = get_object_or_404(self.Object, id=pk)
         serializer = self.serializer_class(object, data=request.data)
         if serializer.is_valid():
             serializer.save(updated_by=self.request.user)

@@ -1,0 +1,7 @@
+[run]
+source=authentification/,budgets/,
+omit = 
+    env
+    */migrations/*
+    */tests/*
+    */__init__.py
