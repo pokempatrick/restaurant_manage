@@ -163,7 +163,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         self.permission_classes = (IsUserOwner,)
         user = self.get_object()
-        serializer = RegisterSerilizer(data=request.data, partial=True)
+        serializer = RegisterSerilizer(user, data=request.data, partial=True)
         if serializer.is_valid():
             user.set_password(serializer.validated_data['password'])
             user.save()

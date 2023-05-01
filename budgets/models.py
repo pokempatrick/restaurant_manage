@@ -14,6 +14,7 @@ class RootModel(TrakingModel):
 
     class Meta:
         abstract = True
+        ordering = ('-created_at',)
 
 
 class Budgets(RootModel):
@@ -40,9 +41,6 @@ class Budgets(RootModel):
         for budget_list in dish_budget_list:
             total += budget_list.total_price
         return total
-
-    class Meta:
-        ordering = ('-created_at',)
 
 
 class DishBudgets(RootModel):

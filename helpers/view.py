@@ -5,17 +5,17 @@ class CreateUpdateMixin:
     # Un mixin est une classe qui ne fonctionne pas de façon autonome
     # Elle permet d'ajouter des fonctionnalités aux classes qui les étendent
 
-    Object = None
     detail_serializer_class = None
 
-    def get_queryset(self):
-        return self.Object.objects.all()
+    list_serialiser_class = None
 
     def get_serializer_class(self):
         # Notre mixin détermine quel serializer à utiliser
         # même si elle ne sait pas ce que c'est ni comment l'utiliser
         if self.action == 'retrieve' and self.detail_serializer_class is not None:
             return self.detail_serializer_class
+        if self.action == 'list' and self.list_serialiser_class is not None:
+            return self.list_serialiser_class
         return super().get_serializer_class()
 
     def create(self, request):
@@ -30,6 +30,16 @@ class CreateUpdateMixin:
     def update(self, request, pk=None):
         object = self.get_object()
         serializer = self.serializer_class(object, data=request.data)
+        if serializer.is_valid():
+            serializer.save(updated_by=self.request.user)
+            return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        object = self.get_object()
+        serializer = self.serializer_class(
+            object, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save(updated_by=self.request.user)
             return response.Response(serializer.data, status=status.HTTP_200_OK)
