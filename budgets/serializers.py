@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from authentification.serializer import RegisterSerilizer
 from budgets.models import Budgets, DishBudgets, ItemIngredientRoots, ItemIngredients
+from helpers.serializers import TrackingSerializer
 
 
 class ItemIngredientsSerializer(serializers.ModelSerializer):
@@ -71,52 +72,21 @@ class DishBudgetsDetailsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DishBudgetsPostSerializer(serializers.ModelSerializer):
+class DishBudgetsPostSerializer(TrackingSerializer):
 
     itemingredients_set = ItemIngredientsSerializer(many=True)
+
+    RootObject = DishBudgets
+
+    NestedObject = ItemIngredients
+
+    nested_attribut = "itemingredients_set"
+
+    root_object = "dish_budget"
 
     class Meta:
         model = DishBudgets
         fields = '__all__'
-
-    def create(self, validated_data):
-        item_ingredient_list = validated_data.pop("itemingredients_set")
-        dish_budget = DishBudgets.objects.create(**validated_data)
-        for item_ingredient in item_ingredient_list:
-            dish_budget.itemingredients_set.create(**item_ingredient)
-        return dish_budget
-
-    def update(self, instance, validated_data):
-
-        item_ingredients_list = validated_data.pop("itemingredients_set")
-        super().update(instance, validated_data)
-
-        """getting list of item_ingredient id with same dish_budget instance"""
-        item_ingredients_with_same_dish_budget_instance = ItemIngredients.objects.filter(
-            dish_budget=instance.id).values_list('id', flat=True)
-
-        item_ingredients_id_pool = []
-
-        for item_ingredient in item_ingredients_list:
-            if "id" in item_ingredient.keys():
-                if ItemIngredients.objects.filter(id=item_ingredient['id']).exists():
-                    item_ingredient_instance = ItemIngredients.objects.get(
-                        id=item_ingredient['id'])
-                    super().update(item_ingredient_instance, dict(item_ingredient))
-                    item_ingredients_id_pool.append(
-                        item_ingredient_instance.id)
-                else:
-                    continue
-            else:
-                item_ingredient_instance = instance.itemingredients_set.create(
-                    **item_ingredient)
-                item_ingredients_id_pool.append(item_ingredient_instance.id)
-
-            for item_ingredient_id in item_ingredients_with_same_dish_budget_instance:
-                if item_ingredient_id not in item_ingredients_id_pool:
-                    ItemIngredients.objects.filter(
-                        pk=item_ingredient_id).delete()
-        return instance
 
 
 class DishBudgetsOtherSerializer(serializers.ModelSerializer):
