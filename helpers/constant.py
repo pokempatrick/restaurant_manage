@@ -11,3 +11,9 @@ ROLES = [
 
 STATUT = [("CREATED", "nouveau"), ("VALIDATED", "validation"),
           ("ACQUISITION", "acquisition"), ("CLOSED", "closed"), ("REJECTED", "rejeté")]
+
+ROLE_TECHNICIAN_HERITED = ["ROLE_COOKER", "ROLE_TECHNICIAN"]
+
+ROLE_ADMIN_HERITED = ["ROLE_SUPER_ADMIN", "ROLE_ADMIN"]
+
+ROLE_OWNER_HERITED = ["ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_OWNER"]

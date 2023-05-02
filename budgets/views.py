@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets, filters, generics, mixins
-from budgets.models import Budgets, DishBudgets
+from budgets.models import Budgets, DishBudgets, Dish, Ingredient
 from budgets import serializers
-from helpers.permission import IsAuthenficatedOnly, IsUserCookerOrReadOnly
+from helpers.permission import IsAuthenficatedOnly, IsUserCookerOrReadOnly, IsUserTechnicianOrReadOnly, IsUserOwner, HasCookerRole
 from helpers.view import CreateUpdateMixin
 
 
@@ -38,3 +38,41 @@ class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 
     def get_queryset(self):
         return DishBudgets.objects.all()
+
+
+class DishViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
+    permission_classes = (IsAuthenficatedOnly, IsUserCookerOrReadOnly)
+    # authentication_classes = ()
+    filter_backends = (filters.SearchFilter,)
+
+    search_fields = ['id', 'name',
+                     'created_by__first_name',
+                     'create_by__last_name', 'description', 'unit_price']
+
+    detail_serializer_class = serializers.DishDetailsSerializer
+    list_serialiser_class = serializers.DishListSerializer
+    serializer_class = serializers.DishSerializer
+
+    def get_queryset(self):
+        return Dish.objects.all()
+
+
+class IngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
+    permission_classes = (IsAuthenficatedOnly, IsUserTechnicianOrReadOnly)
+    # authentication_classes = ()
+    filter_backends = (filters.SearchFilter,)
+
+    search_fields = ['id', 'name',
+                     'created_by__first_name',
+                     'create_by__last_name', 'description', 'unit_price']
+
+    detail_serializer_class = serializers.IngredientDetailsSerializer
+    list_serialiser_class = serializers.IngredientListSerializer
+    serializer_class = serializers.IngredientSerializer
+
+    def get_queryset(self):
+        return Ingredient.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        self.permission_classes = (HasCookerRole,)
+        return super().destroy(request, *args, **kwargs)

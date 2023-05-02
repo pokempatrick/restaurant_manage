@@ -1,10 +1,14 @@
 from django.db import models
+import os
+import uuid
 from datetime import timedelta
 from django.utils import timezone
+from django.core.validators import FileExtensionValidator
+
 from authentification.models import User
 from helpers.models import TrakingModel
 from helpers.constant import STATUT
-
+from helpers.validator import validate_file_size
 # Create your models here.
 
 
@@ -82,3 +86,44 @@ class ItemIngredients(ItemIngredientRoots):
 
     def __str__(self) -> str:
         return f'{self.total_price} - {self.unit_price} - {self.dish_budget} '
+
+
+class Ingredient(RootModel):
+
+    def get_file_path(instance, filename):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        return os.path.join('documents/', filename)
+
+    description = models.TextField()
+    updated_by = models.ForeignKey(
+        User, related_name="update_ingredient", on_delete=models.CASCADE, blank=True, null=True)
+    name = models.CharField(max_length=100, unique=True,)
+    measure_unit = models.CharField(max_length=10)
+    unit_price = models.IntegerField()
+    image = models.ImageField(
+        upload_to=get_file_path,
+        max_length=100, blank=True, null=True,
+        validators=[validate_file_size,
+                    FileExtensionValidator(['jpg', 'png', 'jpeg'])]
+    )
+
+
+class Dish(RootModel):
+
+    def get_file_path(instance, filename):
+        ext = filename.split('.')[-1]
+        filename = "%s.%s" % (uuid.uuid4(), ext)
+        return os.path.join('documents/', filename)
+
+    name = models.CharField(max_length=100, unique=True,)
+    description = models.TextField()
+    unit_price = models.IntegerField()
+    updated_by = models.ForeignKey(
+        User, related_name="update_dish", on_delete=models.CASCADE, blank=True, null=True)
+    image = models.ImageField(
+        upload_to=get_file_path,
+        max_length=100, blank=True, null=True,
+        validators=[validate_file_size,
+                    FileExtensionValidator(['jpg', 'png', 'jpeg'])]
+    )

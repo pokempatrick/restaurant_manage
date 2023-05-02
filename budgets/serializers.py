@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from authentification.serializer import RegisterSerilizer
-from budgets.models import Budgets, DishBudgets, ItemIngredientRoots, ItemIngredients
+from budgets.models import Budgets, DishBudgets, ItemIngredientRoots, ItemIngredients, Dish, Ingredient
 from helpers.serializers import TrackingSerializer
 
 
@@ -89,10 +89,58 @@ class DishBudgetsPostSerializer(TrackingSerializer):
         fields = '__all__'
 
 
-class DishBudgetsOtherSerializer(serializers.ModelSerializer):
+# class DishBudgetsOtherSerializer(serializers.ModelSerializer):
 
-    itemingredients_set = ItemIngredientsSerializer(many=True)
+#     itemingredients_set = ItemIngredientsSerializer(many=True)
+
+#     class Meta:
+#         model = DishBudgets
+#         exclude = ['budget']
+
+
+class DishSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dish
+        fields = '__all__'
+
+
+class DishDetailsSerializer(serializers.ModelSerializer):
+
+    added_by = RegisterSerilizer(
+        read_only=True, default=None)
+    updated_by = RegisterSerilizer(
+        read_only=True, default=None)
 
     class Meta:
-        model = DishBudgets
-        exclude = ['budget']
+        model = Dish
+        fields = '__all__'
+
+
+class DishListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dish
+        fields = ('name', 'unit_price', 'created_at')
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
+
+
+class IngredientDetailsSerializer(serializers.ModelSerializer):
+
+    added_by = RegisterSerilizer(
+        read_only=True, default=None)
+    updated_by = RegisterSerilizer(
+        read_only=True, default=None)
+
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
+
+
+class IngredientListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = ('name', 'unit_price', 'created_at')

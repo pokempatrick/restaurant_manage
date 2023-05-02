@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from helpers import constant
 
 
 class IsAuthenficatedOnly(permissions.BasePermission):
@@ -18,7 +19,7 @@ class HasAdminRole(permissions.BasePermission):
         if (request.method in permissions.SAFE_METHODS):
             return True
 
-        return request.user.role_name in ["ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER"]
+        return request.user.role_name in constant.ROLE_ADMIN_HERITED
 
 
 class HasOWNERRole(permissions.BasePermission):
@@ -26,7 +27,7 @@ class HasOWNERRole(permissions.BasePermission):
         """
             Return `True` if permission is granted, `False` otherwise.
         """
-        return request.user.role_name in ["ROLE_OWNER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER"]
+        return request.user.role_name in constant.ROLE_OWNER_HERITED
 
 
 class IsUserOWNEROrReadOnly(permissions.BasePermission):
@@ -36,7 +37,7 @@ class IsUserOWNEROrReadOnly(permissions.BasePermission):
         """
         if (request.method in permissions.SAFE_METHODS):
             return True
-        return request.user.role_name in ["ROLE_OWNER", "ROLE_ADMIN", "ROLE_SUPER_ADMIN", "ROLE_MANAGER"]
+        return request.user.role_name in constant.ROLE_OWNER_HERITED
 
 
 class HasManagerRole(permissions.BasePermission):
@@ -76,7 +77,7 @@ class IsUserAccountantOrReadOnly(permissions.BasePermission):
 
 
 class HasCookerRole(permissions.BasePermission):
-    def has_permission(self, request, view):
+    def has_object_permission(self, request, view, obj):
         """
             Return `True` if permission is granted, `False` otherwise.
         """
@@ -99,7 +100,7 @@ class HasTechnicianRole(permissions.BasePermission):
         """
             Return `True` if permission is granted, `False` otherwise.
         """
-        return request.user.role_name == "ROLE_TECHNICIAN"
+        return request.user.role_name in constant.ROLE_TECHNICIAN_HERITED
 
 
 class IsUserTechnicianOrReadOnly(permissions.BasePermission):
@@ -109,7 +110,7 @@ class IsUserTechnicianOrReadOnly(permissions.BasePermission):
         """
         if (request.method in permissions.SAFE_METHODS):
             return True
-        return request.user.role_name == "ROLE_TECHNICIAN"
+        return request.user.role_name in constant.ROLE_TECHNICIAN_HERITED
 
 
 class IsUserOwnerOrReadOnly(permissions.BasePermission):
