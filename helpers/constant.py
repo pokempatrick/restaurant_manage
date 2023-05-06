@@ -9,7 +9,7 @@ ROLES = [
     ("ROLE_ANONYME", "Anonyme"),
 ]
 
-STATUT = [("CREATED", "nouveau"), ("VALIDATED", "validation"),
+STATUT = [("CREATED", "nouveau"), ("VALIDATED", "validation"), ("SUBMITTED", "Soumis"),
           ("ACQUISITION", "acquisition"), ("CLOSED", "closed"), ("REJECTED", "rejeté")]
 
 ROLE_TECHNICIAN_HERITED = ["ROLE_COOKER", "ROLE_TECHNICIAN"]
@@ -17,3 +17,6 @@ ROLE_TECHNICIAN_HERITED = ["ROLE_COOKER", "ROLE_TECHNICIAN"]
 ROLE_ADMIN_HERITED = ["ROLE_SUPER_ADMIN", "ROLE_ADMIN"]
 
 ROLE_OWNER_HERITED = ["ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_OWNER"]
+
+
+EDITABLE_STATUT = ["CREATED", "REJECTED"]

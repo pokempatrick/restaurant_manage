@@ -131,7 +131,7 @@ class TestUserViews(TestCase):
             first_name="john",
             last_name="does",
             password='1234password',
-            role_name="ROLE_MANAGER"
+            role_name="ROLE_OWNER"
         )
 
         # create another user
@@ -204,7 +204,7 @@ class TestUserViews(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data['count'] == 2)
+        self.assertTrue(response.data['count'] == 1)
 
     def test_delete_user(self):
         response = self.client.delete(

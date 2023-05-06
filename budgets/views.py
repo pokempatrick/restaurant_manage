@@ -2,12 +2,13 @@ from django.shortcuts import render
 from rest_framework import viewsets, filters, generics, mixins
 from budgets.models import Budgets, DishBudgets, Dish, Ingredient
 from budgets import serializers
-from helpers.permission import IsAuthenficatedOnly, IsUserCookerOrReadOnly, IsUserTechnicianOrReadOnly, IsUserOwner, HasCookerRole
+from helpers.permission import IsAuthenficatedOnly, IsUserCookerOrReadOnly, IsUserTechnicianOrReadOnly, IsBudgetEditable, HasCookerRole
 from helpers.view import CreateUpdateMixin
 
 
 class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (IsAuthenficatedOnly, IsUserCookerOrReadOnly)
+    permission_classes = (IsAuthenficatedOnly,
+                          IsUserCookerOrReadOnly, IsBudgetEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -24,7 +25,8 @@ class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 
 
 class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (IsAuthenficatedOnly, IsUserCookerOrReadOnly)
+    permission_classes = (IsAuthenficatedOnly,
+                          IsUserCookerOrReadOnly, IsBudgetEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 

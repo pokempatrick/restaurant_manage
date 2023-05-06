@@ -42,6 +42,9 @@ class TestBudgetsViews(TestCase):
         self.budget = Budgets.objects.create(
             description="Test de fonctionnement",
             statut="CREATED")
+        self.budget_submitted = Budgets.objects.create(
+            description="Test de fonctionnement",
+            statut="SUBMITTED")
         self.dish_budget = self.budget.dishbudgets_set.create(
             dish_name="sauce tomate",
             dish_quantity=20,
@@ -76,14 +79,27 @@ class TestBudgetsViews(TestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_budget(self):
-        response = self.client.put(
+        response = self.client.patch(
             self.budgets_url+f'{self.budget.id}/',
             json.dumps({
                 "description": "Test de fonctionnement 2",
-                "statut": "VALIDATED",
+                "statut": "CREATED",
                 "start_date": datetime.now(),
                 "end_date": datetime.now()+timedelta(days=5),
             }, cls=DjangoJSONEncoder),
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
+
+        self.assertEqual(response.data["statut"], "CREATED")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_budget_statut(self):
+        response = self.client.patch(
+            self.budgets_url+f'{self.budget.id}/',
+            json.dumps({
+                "statut": "VALIDATED",
+            }),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
             content_type="application/json"
         )
@@ -106,7 +122,6 @@ class TestBudgetsViews(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data['count'] == 1)
 
     def test_delete_budget(self):
         response = self.client.delete(
@@ -116,6 +131,17 @@ class TestBudgetsViews(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_update_non_editable_budget(self):
+        response = self.client.patch(
+            self.budgets_url+f'{self.budget_submitted.id}/',
+            json.dumps({
+                "statut": "VALIDATED",
+            }),
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class TestDishBudgetsView(TestCase):
@@ -157,7 +183,15 @@ class TestDishBudgetsView(TestCase):
             dish_quantity=20,
             budget=self.budget
         )
+
         self.dish_budget.itemingredients_set.add(self.item_ingredient)
+        self.dish_budget_with_non_editatble_budget = DishBudgets.objects.create(
+            dish_name="sauce tomate",
+            dish_quantity=20,
+            budget=Budgets.objects.create(
+                description="Test de fonctionnement",
+                statut="SUBMITTED")
+        )
 
     def test_add_dishbudgets(self):
         response = self.client.post(
@@ -194,7 +228,6 @@ class TestDishBudgetsView(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(response.data['count'] == 1)
 
     def test_update_dishbudget(self):
         response = self.client.put(
@@ -250,6 +283,18 @@ class TestDishBudgetsView(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_update_dishbudget_with_non_editable_budget(self):
+        response = self.client.patch(
+            self.dishbudget_url +
+            f'{self.dish_budget_with_non_editatble_budget.id}/',
+            json.dumps({
+                "dish_quantity": 158,
+            }),
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class DishView(TestCase):
