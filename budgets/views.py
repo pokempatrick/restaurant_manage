@@ -16,7 +16,7 @@ class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     search_fields = ['id', 'description',
                      'statut', 'start_date', 'end_date',
                      'added_by__first_name', 'added_by__last_name',
-                     'dishbudgets__dish_name', 'dishbudgets__dish_quantity']
+                     'dishbudgets__dish_name', 'dishbudgets__dish_quantity', 'dishbudgets__dish_id']
 
     detail_serializer_class = serializers.BudgetsDetailsSerializer
     serializer_class = serializers.BudgetsSerializer
@@ -34,7 +34,7 @@ class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 
     search_fields = ['id', 'total_price',
                      'created_at',
-                     'dish_name', 'dish_quantity']
+                     'dish_name', 'dish_quantity', 'dish_id']
 
     detail_serializer_class = serializers.DishBudgetsDetailsSerializer
     list_serialiser_class = serializers.DishBudgetsSerializer
