@@ -127,3 +127,12 @@ class Dish(RootModel):
         validators=[validate_file_size,
                     FileExtensionValidator(['jpg', 'png', 'jpeg'])]
     )
+
+
+class Validations(RootModel):
+
+    comment = models.TextField()
+    statut = models.BooleanField(default=True)
+    budgets = models.ForeignKey(
+        Budgets,  on_delete=models.CASCADE, blank=True, null=True,
+    )

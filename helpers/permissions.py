@@ -4,6 +4,7 @@ from budgets.models import Budgets, DishBudgets
 
 
 class IsAuthenficatedOnly(permissions.BasePermission):
+    message = "Only authenticated can perform this action"
 
     def has_permission(self, request, view):
         """
@@ -13,6 +14,8 @@ class IsAuthenficatedOnly(permissions.BasePermission):
 
 
 class HasAdminRole(permissions.BasePermission):
+    message = "Only admin can perform this action"
+
     def has_permission(self, request, view):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -24,6 +27,8 @@ class HasAdminRole(permissions.BasePermission):
 
 
 class HasOWNERRole(permissions.BasePermission):
+    message = "Only owner can perform this action"
+
     def has_object_permission(self, request, view, obj):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -32,6 +37,8 @@ class HasOWNERRole(permissions.BasePermission):
 
 
 class IsUserOWNEROrReadOnly(permissions.BasePermission):
+    message = "Only owner can perform this action"
+
     def has_permission(self, request, view):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -42,6 +49,8 @@ class IsUserOWNEROrReadOnly(permissions.BasePermission):
 
 
 class HasManagerRole(permissions.BasePermission):
+    message = "Only manager can perform this action"
+
     def has_object_permission(self, request, view, obj):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -50,6 +59,8 @@ class HasManagerRole(permissions.BasePermission):
 
 
 class IsUserManagerOrReadOnly(permissions.BasePermission):
+    message = "Only manager can perform this action"
+
     def has_permission(self, request, view):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -60,6 +71,8 @@ class IsUserManagerOrReadOnly(permissions.BasePermission):
 
 
 class HasAccoutantRole(permissions.BasePermission):
+    message = "Only accountant can perform this action"
+
     def has_permission(self, request, view):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -68,6 +81,8 @@ class HasAccoutantRole(permissions.BasePermission):
 
 
 class IsUserAccountantOrReadOnly(permissions.BasePermission):
+    message = "Only accountant can perform this action"
+
     def has_permission(self, request, view):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -78,6 +93,8 @@ class IsUserAccountantOrReadOnly(permissions.BasePermission):
 
 
 class HasCookerRole(permissions.BasePermission):
+    message = "Only cooker can perform this action"
+
     def has_object_permission(self, request, view, obj):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -86,6 +103,7 @@ class HasCookerRole(permissions.BasePermission):
 
 
 class IsUserCookerOrReadOnly(permissions.BasePermission):
+    message = "Only cooker can perform this action"
 
     def has_permission(self, request, view):
         """
@@ -97,6 +115,8 @@ class IsUserCookerOrReadOnly(permissions.BasePermission):
 
 
 class HasTechnicianRole(permissions.BasePermission):
+    message = "Only technician can perform this action"
+
     def has_permission(self, request, view):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -105,6 +125,8 @@ class HasTechnicianRole(permissions.BasePermission):
 
 
 class IsUserTechnicianOrReadOnly(permissions.BasePermission):
+    message = "Only technician can perform this action"
+
     def has_permission(self, request, view):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -115,6 +137,8 @@ class IsUserTechnicianOrReadOnly(permissions.BasePermission):
 
 
 class IsUserOwnerOrReadOnly(permissions.BasePermission):
+    message = "Only the owner can perform this action"
+
     def has_object_permission(self, request, view, obj):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -125,6 +149,8 @@ class IsUserOwnerOrReadOnly(permissions.BasePermission):
 
 
 class IsUserOwner(permissions.BasePermission):
+    message = "Only the owner can perform this action"
+
     def has_object_permission(self, request, view, obj):
         """
             Return `True` if permission is granted, `False` otherwise.
@@ -135,6 +161,8 @@ class IsUserOwner(permissions.BasePermission):
 
 
 class IsBudgetEditable(permissions.BasePermission):
+    message = "The budget is no more editable"
+
     def has_object_permission(self, request, view, obj):
         """
             Return `True` if permission is granted, `False` otherwise.

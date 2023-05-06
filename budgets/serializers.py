@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from authentification.serializer import RegisterSerilizer
-from budgets.models import Budgets, DishBudgets, ItemIngredientRoots, ItemIngredients, Dish, Ingredient
+from budgets.models import Budgets, DishBudgets, ItemIngredientRoots, ItemIngredients, Dish, Ingredient, Validations
 from helpers.serializers import TrackingSerializer
 
 
@@ -31,6 +31,21 @@ class BudgetsSerializer(serializers.ModelSerializer):
                   'start_date', 'end_date', 'added_by', 'created_at', 'description')
 
 
+class ValidationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Validations
+        fields = '__all__'
+
+    def validate(self, value):
+        budgets = self.context["budgets"]
+        if budgets.statut == "SUBMITTED" and budgets.total_price > 0:
+            return value
+        else:
+            raise serializers.ValidationError(
+                "The statut of should be submitted.")
+
+
 class DishBudgetsSerializer(serializers.ModelSerializer):
 
     added_by = RegisterSerilizer(
@@ -49,6 +64,8 @@ class BudgetsDetailsSerializer(serializers.ModelSerializer):
     updated_by = RegisterSerilizer(
         read_only=True, default=None)
     dishbudgets_set = DishBudgetsSerializer(
+        read_only=True, default=None, many=True)
+    validations_set = ValidationSerializer(
         read_only=True, default=None, many=True)
 
     class Meta:
@@ -87,15 +104,6 @@ class DishBudgetsPostSerializer(TrackingSerializer):
     class Meta:
         model = DishBudgets
         fields = '__all__'
-
-
-# class DishBudgetsOtherSerializer(serializers.ModelSerializer):
-
-#     itemingredients_set = ItemIngredientsSerializer(many=True)
-
-#     class Meta:
-#         model = DishBudgets
-#         exclude = ['budget']
 
 
 class DishSerializer(serializers.ModelSerializer):

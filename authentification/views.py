@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from rest_framework.decorators import action
 from authentification.models import User
-from helpers.permission import HasOWNERRole, IsUserOwner
+from helpers.permissions import HasOWNERRole, IsUserOwner
 from helpers.utils import recover_email, check_token
 
 # Create your views here.

@@ -1,5 +1,5 @@
 from rest_framework.test import APITestCase
-from budgets.models import Budgets, ItemIngredients, DishBudgets
+from budgets.models import Budgets, ItemIngredients, DishBudgets, Validations
 from datetime import datetime
 
 
@@ -42,3 +42,11 @@ class TestModel(APITestCase):
         dish_budget.itemingredients_set.add(self.item_ingredient)
         self.assertIsInstance(dish_budget, DishBudgets)
         self.assertEqual(dish_budget.total_price, 200)
+
+    def test_create_validation(self):
+        validation = Validations.objects.create(
+            comment="everything is ok",
+            statut=True,
+            budgets=self.budget
+        )
+        self.assertIsInstance(validation, Validations)

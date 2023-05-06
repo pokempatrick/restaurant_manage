@@ -8,5 +8,8 @@ router.register('dish', views.DishViewSet, basename='dish')
 router.register('budgets', views.BudjetsViewSet, basename='budgets')
 router.register('dish_budget', views.DishBudjetsViewSet,
                 basename='dish_budget')
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('budgets/<str:pk>/validations/',
+         views.ValidationAPIView.as_view(), name='validations_budget'),
+]
+urlpatterns += router.urls

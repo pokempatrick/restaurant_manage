@@ -1,14 +1,15 @@
 from django.shortcuts import render
-from rest_framework import viewsets, filters, generics, mixins
+from rest_framework import viewsets, filters, generics, mixins, response, status
 from budgets.models import Budgets, DishBudgets, Dish, Ingredient
+from django.shortcuts import get_object_or_404
 from budgets import serializers
-from helpers.permission import IsAuthenficatedOnly, IsUserCookerOrReadOnly, IsUserTechnicianOrReadOnly, IsBudgetEditable, HasCookerRole
+from helpers import permissions
 from helpers.view import CreateUpdateMixin
 
 
 class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (IsAuthenficatedOnly,
-                          IsUserCookerOrReadOnly, IsBudgetEditable)
+    permission_classes = (permissions.IsAuthenficatedOnly,
+                          permissions.IsUserCookerOrReadOnly, permissions.IsBudgetEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -25,8 +26,9 @@ class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 
 
 class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (IsAuthenficatedOnly,
-                          IsUserCookerOrReadOnly, IsBudgetEditable)
+    permission_classes = (permissions.IsAuthenficatedOnly,
+                          permissions.IsUserCookerOrReadOnly,
+                          permissions.IsBudgetEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -43,7 +45,8 @@ class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 
 
 class DishViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (IsAuthenficatedOnly, IsUserCookerOrReadOnly)
+    permission_classes = (permissions.IsAuthenficatedOnly,
+                          permissions.IsUserCookerOrReadOnly)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -60,7 +63,8 @@ class DishViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 
 
 class IngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (IsAuthenficatedOnly, IsUserTechnicianOrReadOnly)
+    permission_classes = (permissions.IsAuthenficatedOnly,
+                          permissions.IsUserTechnicianOrReadOnly)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -76,5 +80,27 @@ class IngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
         return Ingredient.objects.all()
 
     def destroy(self, request, *args, **kwargs):
-        self.permission_classes = (HasCookerRole,)
+        self.permission_classes = (permissions.HasCookerRole,)
         return super().destroy(request, *args, **kwargs)
+
+
+class ValidationAPIView(generics.CreateAPIView):
+
+    permission_classes = (permissions.IsAuthenficatedOnly,
+                          permissions.IsUserManagerOrReadOnly)
+    serializer_class = serializers.ValidationSerializer
+
+    def create(self, request, pk=None):
+        budgets = get_object_or_404(Budgets, id=pk)
+        serializer = self.serializer_class(
+            data=request.data, context={"budgets": budgets})
+        if serializer.is_valid():
+            if serializer.validated_data['statut']:
+                budgets.statut = "VALIDATED"
+            else:
+                budgets.statut = "REJECTED"
+            serializer.save(added_by=self.request.user, budgets=budgets)
+            budgets.save()
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
