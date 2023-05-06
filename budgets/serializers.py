@@ -2,6 +2,7 @@ from rest_framework import serializers
 from authentification.serializer import RegisterSerilizer
 from budgets.models import Budgets, DishBudgets, ItemIngredientRoots, ItemIngredients, Dish, Ingredient, Validations
 from helpers.serializers import TrackingSerializer
+from helpers import constant
 
 
 class ItemIngredientsSerializer(serializers.ModelSerializer):
@@ -33,14 +34,25 @@ class BudgetsSerializer(serializers.ModelSerializer):
 
 class ValidationSerializer(serializers.ModelSerializer):
 
+    added_by = RegisterSerilizer(
+        read_only=True, default=None)
+
+    assign_user = RegisterSerilizer(
+        read_only=True, default=None)
+
     class Meta:
         model = Validations
         fields = '__all__'
 
     def validate(self, value):
         budgets = self.context["budgets"]
+        assign_user = self.context["assign_user"]
         if budgets.statut == "SUBMITTED" and budgets.total_price > 0:
-            return value
+            if assign_user.role_name in constant.ROLE_TECHNICIAN_HERITED:
+                return value
+            else:
+                raise serializers.ValidationError(
+                    "The assign user should be a technician or a cooker.")
         else:
             raise serializers.ValidationError(
                 "The statut of should be submitted.")

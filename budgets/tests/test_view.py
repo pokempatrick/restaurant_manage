@@ -555,6 +555,7 @@ class ValidationsView(TestCase):
             json.dumps({
                 "statut": False,
                 "comment": "we don't have enough money",
+                "assign_user": self.user_technician.id,
             }),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_manager.token}'},
             content_type="application/json"
@@ -567,6 +568,7 @@ class ValidationsView(TestCase):
             json.dumps({
                 "statut": False,
                 "comment": "we don't have enough money",
+                "assign_user": self.user_technician.id,
             }),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_technician.token}'},
             content_type="application/json"
@@ -580,6 +582,7 @@ class ValidationsView(TestCase):
             json.dumps({
                 "statut": False,
                 "comment": "we don't have enough money",
+                "assign_user": self.user_manager.id,
             }),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_manager.token}'},
             content_type="application/json"

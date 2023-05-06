@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, filters, generics, mixins, response, status
 from budgets.models import Budgets, DishBudgets, Dish, Ingredient
+from authentification.models import User
 from django.shortcuts import get_object_or_404
 from budgets import serializers
 from helpers import permissions
@@ -91,15 +92,18 @@ class ValidationAPIView(generics.CreateAPIView):
     serializer_class = serializers.ValidationSerializer
 
     def create(self, request, pk=None):
+        assign_user_id = request.data.pop("assign_user")
         budgets = get_object_or_404(Budgets, id=pk)
+        assign_user = get_object_or_404(User, id=assign_user_id)
         serializer = self.serializer_class(
-            data=request.data, context={"budgets": budgets})
+            data=request.data, context={"budgets": budgets, "assign_user": assign_user})
         if serializer.is_valid():
             if serializer.validated_data['statut']:
                 budgets.statut = "VALIDATED"
             else:
                 budgets.statut = "REJECTED"
-            serializer.save(added_by=self.request.user, budgets=budgets)
+            serializer.save(added_by=self.request.user,
+                            budgets=budgets, assign_user=assign_user)
             budgets.save()
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 

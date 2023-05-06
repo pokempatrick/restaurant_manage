@@ -14,7 +14,7 @@ from helpers.validator import validate_file_size
 
 class RootModel(TrakingModel):
     added_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True)
+        User, on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -25,7 +25,7 @@ class Budgets(RootModel):
 
     description = models.TextField()
     updated_by = models.ForeignKey(
-        User, related_name="update_budget", on_delete=models.CASCADE, blank=True, null=True)
+        User, related_name="update_budget", on_delete=models.SET_NULL, blank=True, null=True)
     start_date = models.DateTimeField(
         blank=False, null=False, default=timezone.now)
     end_date = models.DateTimeField(
@@ -50,7 +50,7 @@ class Budgets(RootModel):
 class DishBudgets(RootModel):
 
     updated_by = models.ForeignKey(
-        User, related_name="update_dish_budget", on_delete=models.CASCADE, blank=True, null=True)
+        User, related_name="update_dish_budget", on_delete=models.SET_NULL, blank=True, null=True)
     budget = models.ForeignKey(
         Budgets, on_delete=models.CASCADE)
     dish_name = models.CharField(max_length=255)
@@ -97,7 +97,7 @@ class Ingredient(RootModel):
 
     description = models.TextField()
     updated_by = models.ForeignKey(
-        User, related_name="update_ingredient", on_delete=models.CASCADE, blank=True, null=True)
+        User, related_name="update_ingredient", on_delete=models.SET_NULL, blank=True, null=True)
     name = models.CharField(max_length=100, unique=True,)
     measure_unit = models.CharField(max_length=10)
     unit_price = models.IntegerField()
@@ -120,7 +120,7 @@ class Dish(RootModel):
     description = models.TextField()
     unit_price = models.IntegerField()
     updated_by = models.ForeignKey(
-        User, related_name="update_dish", on_delete=models.CASCADE, blank=True, null=True)
+        User, related_name="update_dish", on_delete=models.SET_NULL, blank=True, null=True)
     image = models.ImageField(
         upload_to=get_file_path,
         max_length=100, blank=True, null=True,
@@ -133,6 +133,8 @@ class Validations(RootModel):
 
     comment = models.TextField()
     statut = models.BooleanField(default=True)
+    assign_user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True, related_name="assign_user")
     budgets = models.ForeignKey(
         Budgets,  on_delete=models.CASCADE, blank=True, null=True,
     )
