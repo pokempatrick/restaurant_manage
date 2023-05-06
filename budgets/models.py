@@ -54,7 +54,7 @@ class DishBudgets(RootModel):
     budget = models.ForeignKey(
         Budgets, on_delete=models.CASCADE)
     dish_name = models.CharField(max_length=255)
-
+    dish_id = models.IntegerField(blank=True, null=True)
     dish_quantity = models.IntegerField()
 
     @property
