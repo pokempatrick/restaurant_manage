@@ -64,19 +64,6 @@ class ValidationSerializer(serializers.ModelSerializer):
         model = Validations
         fields = '__all__'
 
-    def validate(self, value):
-        budgets = self.context["budgets"]
-        assign_user = self.context["assign_user"]
-        if budgets.statut == "SUBMITTED" and budgets.total_price > 0:
-            if assign_user.role_name in constant.ROLE_TECHNICIAN_HERITED:
-                return value
-            else:
-                raise serializers.ValidationError(
-                    "The assign user should be a technician or a cooker.")
-        else:
-            raise serializers.ValidationError(
-                "The statut of should be submitted.")
-
 
 class ItemIngredientsSerializer(serializers.ModelSerializer):
 

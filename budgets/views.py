@@ -1,17 +1,17 @@
 from django.shortcuts import render
 from rest_framework import viewsets, filters, generics, mixins, response, status
 from budgets.models import Budgets, DishBudgets
-from dishes.models import Dish, Ingredient
 from authentification.models import User
 from django.shortcuts import get_object_or_404
 from budgets import serializers as budgets_serializers
+from budgets.permissions import IsBudgetEditable
 from helpers import permissions
 from helpers.view import CreateUpdateMixin
 
 
 class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     permission_classes = (permissions.IsAuthenficatedOnly,
-                          permissions.IsUserCookerOrReadOnly, permissions.IsBudgetEditable)
+                          permissions.IsUserCookerOrReadOnly, IsBudgetEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -30,7 +30,7 @@ class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     permission_classes = (permissions.IsAuthenficatedOnly,
                           permissions.IsUserCookerOrReadOnly,
-                          permissions.IsBudgetEditable)
+                          IsBudgetEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -50,7 +50,7 @@ class ValidationAPIView(generics.CreateAPIView):
 
     permission_classes = (permissions.IsAuthenficatedOnly,
                           permissions.IsUserManagerOrReadOnly)
-    serializer_class = budgets_serializers.ValidationSerializer
+    serializer_class = budgets_serializers.ValidationBudSerializer
 
     def create(self, request, pk=None):
         assign_user_id = request.data.pop("assign_user")

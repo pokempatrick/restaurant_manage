@@ -1,15 +1,8 @@
 from rest_framework.test import APITestCase
-from procurement.models import Procurements
-from budgets.models import ItemIngredients, Budgets
 
 
 class TestModel(APITestCase):
     @classmethod
-    def setUp(self):
-        self.budget = Budgets.objects.create(
-            description="Test de fonctionnement 1",
-            statut="nouveau")
-
     def test_create_procurement(self):
         pass
         # procurement = Procurements.objects.create(

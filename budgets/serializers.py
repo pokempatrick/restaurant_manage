@@ -4,6 +4,7 @@ from budgets.models import Budgets, DishBudgets
 from helpers.serializers import TrackingSerializer
 from dishes.models import ItemIngredients
 from dishes.serializers import ItemIngredientsSerializer, ValidationSerializer
+from helpers import constant
 
 
 class BudgetsSerializer(serializers.ModelSerializer):
@@ -15,6 +16,21 @@ class BudgetsSerializer(serializers.ModelSerializer):
         model = Budgets
         fields = ('id', 'statut', 'total_price',
                   'start_date', 'end_date', 'added_by', 'created_at', 'description')
+
+
+class ValidationBudSerializer(ValidationSerializer):
+    def validate(self, value):
+        budgets = self.context["budgets"]
+        assign_user = self.context["assign_user"]
+        if budgets.statut == "SUBMITTED" and budgets.total_price > 0:
+            if assign_user.role_name in constant.ROLE_TECHNICIAN_HERITED:
+                return value
+            else:
+                raise serializers.ValidationError(
+                    "The assign user should be a technician or a cooker.")
+        else:
+            raise serializers.ValidationError(
+                "The statut of should be submitted.")
 
 
 class DishBudgetsSerializer(serializers.ModelSerializer):

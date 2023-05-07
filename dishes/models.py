@@ -4,6 +4,7 @@ import uuid
 from django.core.validators import FileExtensionValidator
 
 from budgets.models import DishBudgets, RootModel, Budgets
+from procurement.models import Procurements
 from authentification.models import User
 from helpers.validator import validate_file_size
 
@@ -20,6 +21,8 @@ class ItemIngredients(ItemIngredientRoots):
     unit_price = models.IntegerField()
     dish_budget = models.ForeignKey(
         DishBudgets, on_delete=models.CASCADE, blank=True, null=True)
+    procurement = models.ForeignKey(
+        Procurements, on_delete=models.CASCADE, blank=True, null=True)
 
     @property
     def total_price(self):
@@ -79,3 +82,5 @@ class Validations(RootModel):
     budgets = models.ForeignKey(
         Budgets,  on_delete=models.CASCADE, blank=True, null=True,
     )
+    procurements = models.ForeignKey(
+        Procurements, on_delete=models.CASCADE, blank=True, null=True)

@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'authentification',
     'budgets',
     'dishes',
+    'procurement',
 ]
 
 MIDDLEWARE = [
