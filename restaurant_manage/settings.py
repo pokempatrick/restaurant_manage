@@ -70,7 +70,8 @@ INSTALLED_APPS = [
     'corsheaders',
 
     'authentification',
-    'budgets'
+    'budgets',
+    'dishes',
 ]
 
 MIDDLEWARE = [

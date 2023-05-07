@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from rest_framework import viewsets, filters, generics, mixins, response, status
-from budgets.models import Budgets, DishBudgets, Dish, Ingredient
+from budgets.models import Budgets, DishBudgets
+from dishes.models import Dish, Ingredient
 from authentification.models import User
 from django.shortcuts import get_object_or_404
-from budgets import serializers
+from budgets import serializers as budgets_serializers
 from helpers import permissions
 from helpers.view import CreateUpdateMixin
 
@@ -19,8 +20,8 @@ class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
                      'added_by__first_name', 'added_by__last_name',
                      'dishbudgets__dish_name', 'dishbudgets__dish_quantity', 'dishbudgets__dish_id']
 
-    detail_serializer_class = serializers.BudgetsDetailsSerializer
-    serializer_class = serializers.BudgetsSerializer
+    detail_serializer_class = budgets_serializers.BudgetsDetailsSerializer
+    serializer_class = budgets_serializers.BudgetsSerializer
 
     def get_queryset(self):
         return Budgets.objects.all()
@@ -37,59 +38,19 @@ class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
                      'created_at',
                      'dish_name', 'dish_quantity', 'dish_id']
 
-    detail_serializer_class = serializers.DishBudgetsDetailsSerializer
-    list_serialiser_class = serializers.DishBudgetsSerializer
-    serializer_class = serializers.DishBudgetsPostSerializer
+    detail_serializer_class = budgets_serializers.DishBudgetsDetailsSerializer
+    list_serialiser_class = budgets_serializers.DishBudgetsSerializer
+    serializer_class = budgets_serializers.DishBudgetsPostSerializer
 
     def get_queryset(self):
         return DishBudgets.objects.all()
-
-
-class DishViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (permissions.IsAuthenficatedOnly,
-                          permissions.IsUserCookerOrReadOnly)
-    # authentication_classes = ()
-    filter_backends = (filters.SearchFilter,)
-
-    search_fields = ['id', 'name',
-                     'created_by__first_name',
-                     'create_by__last_name', 'description', 'unit_price']
-
-    detail_serializer_class = serializers.DishDetailsSerializer
-    list_serialiser_class = serializers.DishListSerializer
-    serializer_class = serializers.DishSerializer
-
-    def get_queryset(self):
-        return Dish.objects.all()
-
-
-class IngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
-    permission_classes = (permissions.IsAuthenficatedOnly,
-                          permissions.IsUserTechnicianOrReadOnly)
-    # authentication_classes = ()
-    filter_backends = (filters.SearchFilter,)
-
-    search_fields = ['id', 'name',
-                     'created_by__first_name',
-                     'create_by__last_name', 'description', 'unit_price']
-
-    detail_serializer_class = serializers.IngredientDetailsSerializer
-    list_serialiser_class = serializers.IngredientListSerializer
-    serializer_class = serializers.IngredientSerializer
-
-    def get_queryset(self):
-        return Ingredient.objects.all()
-
-    def destroy(self, request, *args, **kwargs):
-        self.permission_classes = (permissions.HasCookerRole,)
-        return super().destroy(request, *args, **kwargs)
 
 
 class ValidationAPIView(generics.CreateAPIView):
 
     permission_classes = (permissions.IsAuthenficatedOnly,
                           permissions.IsUserManagerOrReadOnly)
-    serializer_class = serializers.ValidationSerializer
+    serializer_class = budgets_serializers.ValidationSerializer
 
     def create(self, request, pk=None):
         assign_user_id = request.data.pop("assign_user")
