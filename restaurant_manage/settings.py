@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'budgets',
     'dishes',
     'procurement',
+    'dish_list',
 ]
 
 MIDDLEWARE = [
