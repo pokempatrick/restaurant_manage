@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from rest_framework import viewsets, filters
-from dishes.models import Dish, Ingredient
+from rest_framework import viewsets, filters, generics
+from dishes.models import Dish, Ingredient, ItemIngredients
 from dishes import serializers as dishes_serializers
 from helpers import permissions
 from helpers.view import CreateUpdateMixin
@@ -15,6 +15,9 @@ class DishViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     search_fields = ['id', 'name',
                      'created_by__first_name',
                      'create_by__last_name', 'description', 'unit_price']
+    filterset_field = ['id', 'name',
+                       'created_by__first_name',
+                       'create_by__last_name', 'description', 'unit_price']
 
     detail_serializer_class = dishes_serializers.DishDetailsSerializer
     list_serialiser_class = dishes_serializers.DishListSerializer
@@ -30,6 +33,9 @@ class IngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
+    filterset_field = ['id', 'name',
+                       'created_by__first_name',
+                       'create_by__last_name', 'description', 'unit_price']
     search_fields = ['id', 'name',
                      'created_by__first_name',
                      'create_by__last_name', 'description', 'unit_price']
@@ -44,3 +50,18 @@ class IngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     def destroy(self, request, *args, **kwargs):
         self.permission_classes = (permissions.HasCookerRole,)
         return super().destroy(request, *args, **kwargs)
+
+
+class ItemIngredientsListView(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenficatedOnly,)
+    # authentication_classes = ()
+    filter_backends = (filters.SearchFilter,)
+    filterset_field = ['dish_budget__budget__id',
+                       'ingredient_name', 'unit_price']
+    search_fields = ['id', 'dish_budget__budget__id',
+                     'procurement__id', 'ingredient_name', 'unit_price']
+
+    serializer_class = dishes_serializers.ItemIngredientsSerializer
+
+    def get_queryset(self):
+        return ItemIngredients.objects.all()

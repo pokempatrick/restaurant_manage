@@ -10,19 +10,33 @@ from django.shortcuts import get_object_or_404
 # Create your views here.
 
 
-class ProcurementsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
+class ProcurementsAPIRUDView(CreateUpdateMixin,
+                             generics.RetrieveUpdateDestroyAPIView):
+
     permission_classes = (permissions.IsAuthenficatedOnly,
                           permissions.IsUserCookerOrReadOnly,
                           IsProcurementEditable)
-    # authentication_classes = ()
-    filter_backends = (filters.SearchFilter,)
-
-    search_fields = ['id', 'total_price', 'comment', 'statut',
-                     'added_by__first_name', 'added_by__last_name', 'budget']
 
     detail_serializer_class = serializers.ProcurementsDetailsSerializer
-    list_serialiser_class = serializers.ProcurementsListSerializer
     serializer_class = serializers.ProcurementsPostSerializer
+
+    def get_queryset(self):
+        return Procurements.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET' and self.detail_serializer_class is not None:
+            return self.detail_serializer_class
+        return self.serializer_class
+
+
+class ProcurementsListAPIView(generics.ListAPIView):
+
+    permission_classes = (permissions.IsAuthenficatedOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['id', 'total_price', 'comment', 'statut',
+                     'added_by__first_name', 'added_by__last_name', 'budget', 'created_at']
+    filterset_field = ['id', 'statut']
+    serializer_class = serializers.ProcurementsListSerializer
 
     def get_queryset(self):
         return Procurements.objects.all()

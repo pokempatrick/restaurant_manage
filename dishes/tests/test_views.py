@@ -3,7 +3,7 @@ from django.urls import reverse
 import json
 from rest_framework import status
 from authentification.models import User
-from dishes.models import Dish, Ingredient
+from dishes.models import Dish, Ingredient, ItemIngredients
 
 
 class DishView(TestCase):
@@ -207,3 +207,34 @@ class IngredientView(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ItemIngredientView(TestCase):
+
+    @classmethod
+    def setUp(self):
+
+        self.client = Client()
+        self.item_ingredient_url = reverse('item_ingredient')
+        # creation d'un utilisateur
+        self.user_cooker = User.objects.create(
+            username='cyrce',
+            email='cyretruly@gmail.com',
+            first_name="john",
+            last_name="does",
+            password='1234password',
+            role_name="ROLE_COOKER"
+        )
+
+        ItemIngredients.objects.create(
+            ingredient_name="tomate rouge",
+            quantity=25,
+            unit_price=100,)
+
+    def test_get_list_item_ingredient(self):
+        response = self.client.get(
+            self.item_ingredient_url,
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

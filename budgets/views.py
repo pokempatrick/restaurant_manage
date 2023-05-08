@@ -16,7 +16,8 @@ class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
                           permissions.IsUserCookerOrReadOnly)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
-
+    filterset_field = ['id', 'statut',
+                       'added_by__first_name', 'added_by__last_name',]
     search_fields = ['id', 'description',
                      'statut', 'start_date', 'end_date',
                      'added_by__first_name', 'added_by__last_name',
@@ -54,7 +55,7 @@ class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
                           IsBudgetEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
-
+    filterset_field = ['id', 'budget__id']
     search_fields = ['id', 'total_price',
                      'created_at',
                      'dish_name', 'dish_quantity', 'dish_id']

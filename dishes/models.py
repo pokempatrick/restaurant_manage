@@ -4,12 +4,13 @@ import uuid
 from django.core.validators import FileExtensionValidator
 
 from budgets.models import DishBudgets, RootModel, Budgets
+from helpers.models import TrakingModel
 from procurement.models import Procurements
 from authentification.models import User
 from helpers.validator import validate_file_size
 
 
-class ItemIngredientRoots(models.Model):
+class ItemIngredientRoots(TrakingModel):
 
     ingredient_name = models.CharField(max_length=255)
     ingredient_id = models.CharField(max_length=255, null=False, blank=False)
