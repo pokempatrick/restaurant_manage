@@ -19,7 +19,7 @@ class Procurements(TrakingModel):
         blank=True, null=True)
 
     budget = models.OneToOneField(
-        Budgets, on_delete=models.CASCADE)
+        Budgets, on_delete=models.CASCADE, blank=True, null=True)
 
     comment = models.TextField()
 

@@ -4,7 +4,7 @@ from procurement import serializers
 from helpers import permissions
 from helpers.view import CreateUpdateMixin
 from procurement.models import Procurements
-from procurement.permissions import IsProcuementEditable
+from procurement.permissions import IsProcurementEditable
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
@@ -13,13 +13,12 @@ from django.shortcuts import get_object_or_404
 class ProcurementsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     permission_classes = (permissions.IsAuthenficatedOnly,
                           permissions.IsUserCookerOrReadOnly,
-                          IsProcuementEditable)
+                          IsProcurementEditable)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
-    search_fields = ['id', 'total_price',
-                     'created_at',
-                     'dish_name', 'dish_quantity', 'dish_id']
+    search_fields = ['id', 'total_price', 'comment', 'statut',
+                     'added_by__first_name', 'added_by__last_name', 'budget']
 
     detail_serializer_class = serializers.ProcurementsDetailsSerializer
     list_serialiser_class = serializers.ProcurementsListSerializer

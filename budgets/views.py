@@ -1,17 +1,19 @@
 from django.shortcuts import render
 from rest_framework import viewsets, filters, generics, mixins, response, status
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
 from budgets.models import Budgets, DishBudgets
 from authentification.models import User
-from django.shortcuts import get_object_or_404
 from budgets import serializers as budgets_serializers
-from budgets.permissions import IsBudgetEditable
+from procurement import serializers as procurement_serializers
+from budgets.permissions import IsBudgetEditable, IsAcquisitionStatus
 from helpers import permissions
 from helpers.view import CreateUpdateMixin
 
 
 class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     permission_classes = (permissions.IsAuthenficatedOnly,
-                          permissions.IsUserCookerOrReadOnly, IsBudgetEditable)
+                          permissions.IsUserCookerOrReadOnly)
     # authentication_classes = ()
     filter_backends = (filters.SearchFilter,)
 
@@ -25,6 +27,25 @@ class BudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
 
     def get_queryset(self):
         return Budgets.objects.all()
+
+    def update(self, request, pk=None):
+        self.permission_classes = (IsBudgetEditable,)
+        return super().update(request, pk)
+
+    def partial_update(self, request, pk=None):
+        self.permission_classes = (IsBudgetEditable,)
+        return super().partial_update(request, pk)
+
+    def destroy(self, request, *args, **kwargs):
+        self.permission_classes = (IsBudgetEditable,)
+        return super().destroy(request, *args, **kwargs)
+
+    @action(detail=True, methods=['post'], url_path='procurements', url_name='procurements_create')
+    def procurements_create(self, request, pk=None):
+        self.serializer_class = procurement_serializers.ProcurementsPostSerializer
+        self.permission_classes = (IsAcquisitionStatus,)
+        budget = self.get_object()
+        return super().create(request, budget=budget)
 
 
 class DishBudjetsViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):

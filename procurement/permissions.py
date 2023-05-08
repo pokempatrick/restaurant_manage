@@ -3,7 +3,7 @@ from helpers import constant
 from procurement.models import Procurements
 
 
-class IsProcuementEditable(permissions.BasePermission):
+class IsProcurementEditable(permissions.BasePermission):
     message = "The budget is no more editable"
 
     def has_object_permission(self, request, view, obj):

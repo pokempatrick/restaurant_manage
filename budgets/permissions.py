@@ -19,3 +19,12 @@ class IsBudgetEditable(permissions.BasePermission):
         """ check if the statut for budget is editable for dishbudget entity """
         if (isinstance(obj, DishBudgets)):
             return obj.budget.statut in constant.EDITABLE_STATUT
+
+
+class IsAcquisitionStatus(permissions.BasePermission):
+    message = "The budget is not on status acquisition"
+
+    def has_object_permission(self, request, view, obj):
+        """ check if the statut for budget is editable for dishbudget entity """
+        if (isinstance(obj, Budgets)):
+            return obj.statut == "ACQUISITION"

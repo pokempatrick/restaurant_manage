@@ -18,30 +18,29 @@ class CreateUpdateMixin:
             return self.list_serialiser_class
         return super().get_serializer_class()
 
-    def create(self, request):
+    def create(self, request, **kwargs):
         serializer = self.serializer_class(data=request.data)
-
         if serializer.is_valid():
-            serializer.save(added_by=self.request.user)
+            serializer.save(added_by=self.request.user, **kwargs)
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request, pk=None):
+    def update(self, request, pk=None, **kwargs):
         object = self.get_object()
         serializer = self.serializer_class(object, data=request.data)
         if serializer.is_valid():
-            serializer.save(updated_by=self.request.user)
+            serializer.save(updated_by=self.request.user, **kwargs)
             return response.Response(serializer.data, status=status.HTTP_200_OK)
 
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def partial_update(self, request, pk=None):
+    def partial_update(self, request, pk=None, **kwargs):
         object = self.get_object()
         serializer = self.serializer_class(
             object, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save(updated_by=self.request.user)
+            serializer.save(updated_by=self.request.user, **kwargs)
             return response.Response(serializer.data, status=status.HTTP_200_OK)
 
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
