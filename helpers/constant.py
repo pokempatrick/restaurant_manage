@@ -21,5 +21,5 @@ ROLE_OWNER_HERITED = ["ROLE_SUPER_ADMIN", "ROLE_ADMIN", "ROLE_OWNER"]
 
 EDITABLE_STATUT = ["CREATED", "REJECTED"]
 
-PROCUREMENT_STATUT = [("CREATED", "nouveau"), ("VALIDATED", "validation"),
-                      ("SUBMITTED", "Soumis"), ("CLOSED", "closed"), ("REJECTED", "rejeté")]
+PROCUREMENT_STATUT = [("CREATED", "nouveau"), ("SUBMITTED", "Soumis"),
+                      ("CLOSED", "closed"), ("REJECTED", "rejeté")]

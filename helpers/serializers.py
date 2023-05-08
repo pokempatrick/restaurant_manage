@@ -22,7 +22,10 @@ class TrackingSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
 
-        nested_objects_list = validated_data.pop(self.nested_attribut)
+        nested_objects_list = []
+        if self.nested_attribut in validated_data.keys():
+            nested_objects_list = validated_data.pop(self.nested_attribut)
+
         super().update(instance, validated_data)
 
         nested_objects_with_same_root_object_instance = self.NestedObject.objects.filter(

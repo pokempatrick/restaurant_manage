@@ -55,7 +55,7 @@ class ProcurementsPostSerializer(TrackingSerializer):
 
     nested_attribut = "itemingredients_set"
 
-    root_object = "procurements"
+    root_object = "procurement"
 
     class Meta:
         model = Procurements

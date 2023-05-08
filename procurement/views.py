@@ -40,7 +40,7 @@ class ValidationAPIView(generics.CreateAPIView):
             data=request.data, context={"procurements": procurements, })
         if serializer.is_valid():
             if serializer.validated_data['statut']:
-                procurements.statut = "VALIDATED"
+                procurements.statut = "CLOSED"
             else:
                 procurements.statut = "REJECTED"
             serializer.save(added_by=self.request.user,
