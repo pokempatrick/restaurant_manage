@@ -1,6 +1,6 @@
 from django.db import models
 
-from helpers.models import TrakingModel
+from helpers.models import DishListRoot, TrakingModel
 from authentification.models import User
 from dish_list.constant import DISHLISTSTATUT, DISHLISTSTATUTHUMAN
 
@@ -28,22 +28,11 @@ class DishResult(TrakingModel):
         return total
 
 
-class DishListRoot(TrakingModel):
-
+class DishListResult(DishListRoot):
     added_by = models.ForeignKey(
         User, on_delete=models.SET_NULL,
         blank=True, null=True)
 
-    dish_name = models.CharField(max_length=255)
-    dish_id = models.CharField(max_length=255, null=False, blank=False)
-    dish_quantity = models.IntegerField()
-
-    class Meta:
-        abstract = True
-        ordering = ('-created_at',)
-
-
-class DishListResult(DishListRoot):
     updated_by = models.ForeignKey(
         User, related_name="update_dish_list_result",
         on_delete=models.SET_NULL,
@@ -54,6 +43,10 @@ class DishListResult(DishListRoot):
 
 
 class DishList(DishListRoot):
+    added_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL,
+        blank=True, null=True)
+
     updated_by = models.ForeignKey(
         User, related_name="update_dish_list",
         on_delete=models.SET_NULL,

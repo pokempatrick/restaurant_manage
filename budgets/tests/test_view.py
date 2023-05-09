@@ -277,15 +277,15 @@ class TestDishBudgetsView(TestCase):
         self.assertEqual(response.data["dish_quantity"], 10)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_delete_dishbudget(self):
-    #     response = self.client.delete(
-    #         self.dishbudget_url+f'{self.dish_budget.id}/',
-    #         **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
-    #         content_type="application/json"
-    #     )
-    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    def test_delete_dishbudget(self):
+        response = self.client.delete(
+            self.dishbudget_url+f'{self.dish_budget.id}/',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    # def test_update_dishbudget_with_non_editable_budget(self):
+    def test_update_dishbudget_with_non_editable_budget(self):
         response = self.client.patch(
             self.dishbudget_url +
             f'{self.dish_budget_with_non_editatble_budget.id}/',

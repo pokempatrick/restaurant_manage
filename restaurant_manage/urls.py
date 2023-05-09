@@ -49,4 +49,5 @@ urlpatterns = [
     path('api/', include('budgets.urls')),
     path('api/', include('dishes.urls')),
     path('api/', include('procurement.urls')),
+    path('api/', include('dish_list.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
