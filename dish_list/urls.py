@@ -10,8 +10,8 @@ urlpatterns = [
     path('dish_result/<str:pk>/validations/',
          views.ValidationAPIView.as_view(), name='validations_dish_result'),
     path('dish_list_result/<str:pk>/',
-         views.DishResultListAPIRUDView.as_view(), name='dish_list_result'),
+         views.DishListResultAPIRUDView.as_view(), name='dish_list_result'),
     path('dish_list_result/',
-         views.DishResultListListAPIView.as_view(), name='dish_list_result-list'),
+         views.DishListResultListAPIView.as_view(), name='dish_list_result-list'),
 ]
 urlpatterns += router.urls

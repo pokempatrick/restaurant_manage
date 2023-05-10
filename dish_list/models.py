@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import timedelta
+from django.utils import timezone
 
 from helpers.models import DishListRoot, TrakingModel
 from authentification.models import User
@@ -14,17 +16,20 @@ class DishResult(TrakingModel):
     added_by = models.ForeignKey(
         User, on_delete=models.SET_NULL,
         blank=True, null=True)
-
+    start_date = models.DateTimeField(
+        blank=False, null=False, default=timezone.now)
+    end_date = models.DateTimeField(
+        blank=False, null=False, default=timezone.now()+timedelta(days=7))
     comment = models.TextField()
     statut = models.CharField(max_length=150, choices=DISHLISTSTATUT,
                               default=DISHLISTSTATUTHUMAN["nouveau"])
 
     @property
     def dish_quantity(self):
-        dish_result_lists = self.dishresultlist_set.all()
+        dish_list_results = self.dishlistresult_set.all()
         total = 0
-        for dish_result_list in dish_result_lists:
-            total += dish_result_list.dish_quantity
+        for dish_list_result in dish_list_results:
+            total += dish_list_result.dish_quantity
         return total
 
 

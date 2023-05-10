@@ -7,7 +7,7 @@ from budgets.models import DishBudgets, RootModel, Budgets
 from dishes.constant import INGREDIENTGROUP, INGREDIENTGROUPLIST
 from helpers.models import TrakingModel
 from procurement.models import Procurements
-from dish_list.models import DishListResult
+from dish_list.models import DishListResult, DishResult
 from authentification.models import User
 from helpers.validator import validate_file_size
 
@@ -91,3 +91,5 @@ class Validations(RootModel):
     )
     procurements = models.ForeignKey(
         Procurements, on_delete=models.CASCADE, blank=True, null=True)
+    dish_result = models.ForeignKey(
+        DishResult, on_delete=models.CASCADE, blank=True, null=True)

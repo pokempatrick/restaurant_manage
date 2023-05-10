@@ -9,7 +9,7 @@ class TestUrls(SimpleTestCase):
     def test_dish_list_result_url_resolves(self):
         url = reverse('dish_list_result', args=["15"])
         self.assertEquals(resolve(url).func.view_class,
-                          views.DishResultListAPIRUDView)
+                          views.DishListResultAPIRUDView)
 
     def test_dish_list_result_validation_url_resolves(self):
         url = reverse('validations_dish_result', args=["15"])
