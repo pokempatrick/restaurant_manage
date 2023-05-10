@@ -1,5 +1,5 @@
 from rest_framework.test import APITestCase
-from dish_list.models import DishResult, DishListResult, DishList
+from dish_list.models import DishResult, DishListResult
 from dishes.models import ItemIngredientRoots
 from datetime import datetime
 
@@ -13,16 +13,6 @@ class TestModel(APITestCase):
             ingredient_name="tomate",
             quantity=200,
         )
-
-    def test_create_dish_list(self):
-        dish_list = DishList.objects.create(
-            unit_price=200,
-            dish_name="pomme pilé",
-            dish_quantity=5,
-            dish_id=14
-        )
-        self.assertIsInstance(dish_list, DishList)
-        self.assertEqual(dish_list.total_price, 1000)
 
     def test_create_dish_list_result(self):
         dish_list_result = DishListResult.objects.create(

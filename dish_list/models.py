@@ -45,19 +45,3 @@ class DishListResult(DishListRoot):
 
     dish_result = models.ForeignKey(
         DishResult, null=True, blank=True, on_delete=models.CASCADE)
-
-
-class DishList(DishListRoot):
-    added_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL,
-        blank=True, null=True)
-
-    updated_by = models.ForeignKey(
-        User, related_name="update_dish_list",
-        on_delete=models.SET_NULL,
-        blank=True, null=True)
-    unit_price = models.IntegerField()
-
-    @property
-    def total_price(self):
-        return self.unit_price*self.dish_quantity
