@@ -1,7 +1,7 @@
 from django.db import models
 import os
 import uuid
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinValueValidator
 
 from budgets.models import DishBudgets, RootModel, Budgets
 from dishes.constant import INGREDIENTGROUP, INGREDIENTGROUPLIST
@@ -17,14 +17,16 @@ class ItemIngredientRoots(TrakingModel):
 
     ingredient_name = models.CharField(max_length=255)
     ingredient_id = models.CharField(max_length=255, null=False, blank=False)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(
+        validators=[MinValueValidator(limit_value=0)])
     dish_list_result = models.ForeignKey(
         DishListResult, on_delete=models.CASCADE, blank=True, null=True)
 
 
 class ItemIngredients(ItemIngredientRoots):
 
-    unit_price = models.IntegerField()
+    unit_price = models.IntegerField(
+        validators=[MinValueValidator(limit_value=0),])
     dish_budget = models.ForeignKey(
         DishBudgets, on_delete=models.CASCADE, blank=True, null=True)
     procurement = models.ForeignKey(
@@ -54,7 +56,8 @@ class Ingredient(RootModel):
         User, related_name="update_ingredient", on_delete=models.SET_NULL, blank=True, null=True)
     name = models.CharField(max_length=100, unique=True,)
     measure_unit = models.CharField(max_length=10)
-    unit_price = models.IntegerField()
+    unit_price = models.IntegerField(
+        validators=[MinValueValidator(limit_value=0),])
     image = models.ImageField(
         upload_to=get_file_path,
         max_length=100, blank=True, null=True,
@@ -72,7 +75,8 @@ class Dish(RootModel):
 
     name = models.CharField(max_length=100, unique=True,)
     description = models.TextField()
-    unit_price = models.IntegerField()
+    unit_price = models.IntegerField(
+        validators=[MinValueValidator(limit_value=0),])
     updated_by = models.ForeignKey(
         User, related_name="update_dish", on_delete=models.SET_NULL, blank=True, null=True)
     image = models.ImageField(

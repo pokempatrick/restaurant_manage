@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 from helpers.models import DishListRoot, TrakingModel
 from authentification.models import User
@@ -70,15 +71,9 @@ class SpoilIngredient(TrakingModel):
 
 
 class DishList(DishListRoot):
-    added_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL,
-        blank=True, null=True)
-
-    updated_by = models.ForeignKey(
-        User, related_name="update_dish_list",
-        on_delete=models.SET_NULL,
-        blank=True, null=True)
-    unit_price = models.IntegerField()
+    unit_price = models.IntegerField(
+        validators=[MinValueValidator(limit_value=0)]
+    )
 
     sale = models.ForeignKey(
         Sale, on_delete=models.CASCADE, null=True,
