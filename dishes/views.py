@@ -20,7 +20,7 @@ class DishViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
                        'create_by__last_name', 'description', 'unit_price']
 
     detail_serializer_class = dishes_serializers.DishDetailsSerializer
-    list_serialiser_class = dishes_serializers.DishListSerializer
+    list_serialiser_class = dishes_serializers.DishRetrieveListSerializer
     serializer_class = dishes_serializers.DishSerializer
 
     def get_queryset(self):

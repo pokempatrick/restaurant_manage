@@ -9,6 +9,7 @@ from helpers.models import TrakingModel
 from procurement.models import Procurements
 from dish_list.models import DishListResult, DishResult
 from sale_spoil.models import SpoilIngredient
+from inventories.models import Inventories
 from authentification.models import User
 from helpers.validator import validate_file_size
 
@@ -33,6 +34,8 @@ class ItemIngredients(ItemIngredientRoots):
         Procurements, on_delete=models.CASCADE, blank=True, null=True)
     spoil_ingredient = models.ForeignKey(
         SpoilIngredient, on_delete=models.CASCADE, blank=True, null=True)
+    inventory = models.ForeignKey(
+        Inventories, on_delete=models.CASCADE, blank=True, null=True)
 
     @property
     def total_price(self):
@@ -100,3 +103,5 @@ class Validations(RootModel):
         Procurements, on_delete=models.CASCADE, blank=True, null=True)
     dish_result = models.ForeignKey(
         DishResult, on_delete=models.CASCADE, blank=True, null=True)
+    inventory = models.ForeignKey(
+        Inventories, on_delete=models.CASCADE, blank=True, null=True)

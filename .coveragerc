@@ -1,5 +1,5 @@
 [run]
-source=authentification/,budgets/,dishes/, procurement/, dish_list/, sale_spoil/,
+source=authentification/,budgets/,dishes/, procurement/, dish_list/, sale_spoil/ ,inventories/,
 omit = 
     env
     */migrations/*

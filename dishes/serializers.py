@@ -22,7 +22,7 @@ class DishDetailsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DishListSerializer(serializers.ModelSerializer):
+class DishRetrieveListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
         fields = ('name', 'unit_price', 'created_at')
