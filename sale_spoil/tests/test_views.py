@@ -114,6 +114,15 @@ class TestSaleViews(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_get_summary(self):
+        response = self.client.get(
+            self.sale_url +
+            f'summary/?start_date=2022-05-13T00:00TZ&dishes={json.dumps([1,2])}',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_accountant.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_get_sale_with_wrong_role(self):
         response = self.client.get(
             self.sale_url+f'{self.sale.id}/',
@@ -244,6 +253,7 @@ class TestSpoilDishViews(TestCase):
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_coocker.token}'},
             content_type="application/json"
         )
+        self.assertEqual(response.data["description"], "test fonctionnel")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_partial_update_spoil_dish(self):

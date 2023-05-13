@@ -21,7 +21,8 @@ class DishResultViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     search_fields = ['id', 'comment',
                      'statut', 'start_date', 'end_date',
                      'added_by__first_name', 'added_by__last_name',
-                     'dishlistresult__dish_name', 'dishlistresult__dish_quantity', 'dishlistresult__dish_id']
+                     'dishlistresult_set__dish_name', 'dishlistresult_set__dish_quantity',
+                     'dishlistresult_set__dish_id']
     detail_serializer_class = serializers.DishResultDetailsSerializer
     serializer_class = serializers.DishResultSerializer
 

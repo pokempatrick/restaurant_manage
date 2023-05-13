@@ -4,7 +4,7 @@ import json
 from rest_framework import status
 from authentification.models import User
 from budgets.models import Budgets, DishBudgets
-from dishes.models import ItemIngredients
+from dishes.models import ItemIngredients, Ingredient
 from procurement.models import Procurements
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -172,11 +172,16 @@ class TestValidationsView(TestCase):
                 statut="ACQUISITION"),
             comment="Test de fonctionnement",
             statut="SUBMITTED")
+
         ItemIngredients.objects.create(
             ingredient_name="tomate rouge",
             quantity=5,
             unit_price=500,
-            procurement=self.procurement_submitted
+            procurement=self.procurement_submitted,
+            ingredient_id=Ingredient.objects.create(name="oignoin",
+                                                    description="une très bonne sauce",
+                                                    unit_price=100,
+                                                    measure_unit="kg",).id
         )
 
         self.validation_url_procurement_created = reverse(

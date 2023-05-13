@@ -47,3 +47,10 @@ def recover_email(email, uncripted_code):
         message=f"This the your code to recover the Password {uncripted_code},I'll be valid for one hour.",
         recipients=[email],
     )
+
+
+def get_objet_summary(Object, start_date, end_date):
+
+    return Object.objects.filter(created_at__gte=start_date,
+                                 created_at__lte=end_date,
+                                 )
