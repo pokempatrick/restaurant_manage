@@ -62,6 +62,22 @@ class TestProcurementViews(TestCase):
                 statut="ACQUISITION"),
             comment="everything is ok")
 
+        """ procurements setup for summary """
+        self.procurements_approved = Procurements.objects.create(
+            budget=Budgets.objects.create(
+                description="Test de fonctionnement 2",
+                statut="ACQUISITION"),
+            statut="APPROVED",
+            comment="everything is ok")
+
+        self.procurements_approved.itemingredients_set.add(
+            ItemIngredients.objects.create(
+                ingredient_name="tomate rouge",
+                quantity=20,
+                unit_price=1000,
+                ingredient_id=1,
+            ))
+
     def test_create_procurement(self):
         response = self.client.post(
             self.budget_url+f'{self.budget.id}/procurements/',
@@ -113,6 +129,15 @@ class TestProcurementViews(TestCase):
     def test_get_procurement(self):
         response = self.client.get(
             self.procurement_url+f'{self.procurement.id}/',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_technician.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_summary_spoil_procurement(self):
+        response = self.client.get(
+            self.procurement_url +
+            f'summary/?start_date=2022-05-13T00:00TZ&ingredient_ids={json.dumps([1,2])}',
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_technician.token}'},
             content_type="application/json"
         )

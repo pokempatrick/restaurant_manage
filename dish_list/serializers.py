@@ -2,8 +2,8 @@ from rest_framework import serializers
 from authentification.serializer import RegisterSerilizer
 from dish_list.models import DishResult, DishListResult
 from helpers.serializers import TrackingSerializer
-from dishes.models import ItemIngredientRoots
-from dishes.serializers import ItemIngredientRootsSerializer, ValidationSerializer
+from dishes.models import ItemIngredients
+from dishes.serializers import ItemIngredientsSerializer, ValidationSerializer
 
 
 class DishResultSerializer(serializers.ModelSerializer):
@@ -62,7 +62,7 @@ class DishListResultDetailsSerializer(serializers.ModelSerializer):
         read_only=True, default=None)
     dish_result = DishResultSerializer(
         read_only=True, default=None)
-    itemingredientroots_set = ItemIngredientRootsSerializer(many=True)
+    itemingredients_set = ItemIngredientsSerializer(many=True)
 
     class Meta:
         model = DishListResult
@@ -71,13 +71,13 @@ class DishListResultDetailsSerializer(serializers.ModelSerializer):
 
 class DishListResultPostSerializer(TrackingSerializer):
 
-    itemingredientroots_set = ItemIngredientRootsSerializer(many=True)
+    itemingredients_set = ItemIngredientsSerializer(many=True)
 
     RootObject = DishListResult
 
-    NestedObject = ItemIngredientRoots
+    NestedObject = ItemIngredients
 
-    nested_attribut = "itemingredientroots_set"
+    nested_attribut = "itemingredients_set"
 
     root_object = "dish_list_result"
 

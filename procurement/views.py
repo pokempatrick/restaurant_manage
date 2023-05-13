@@ -1,11 +1,13 @@
-from django.shortcuts import render
-from rest_framework import viewsets, filters, generics, mixins, response, status
+from rest_framework import filters, generics, response, status
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from datetime import timedelta
 from procurement import serializers
+from helpers.utils import get_objet_summary
 from helpers import permissions
 from helpers.view import CreateUpdateMixin
 from procurement.models import Procurements
 from procurement.permissions import IsProcurementEditable
-from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -40,6 +42,32 @@ class ProcurementsListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return Procurements.objects.all()
+
+
+class ProcurementsSummaryAPIView(generics.ListAPIView):
+
+    permission_classes = (permissions.IsAuthenficatedOnly,)
+    serializer_class = serializers.ProcurementsPostSerializer
+
+    def get(self, request, *args, **kwargs):
+        start_date = request.GET.get(
+            'start_date', timezone.now()-timedelta(hours=8))
+        end_date = request.GET.get('end_date', timezone.now())
+        ingeredient_ids = request.GET.get('ingeredient_ids', '')
+        if ingeredient_ids:
+            spoil_ingredients = get_objet_summary(Procurements, start_date, end_date).filter(
+                itemingredients__ingredient_id__in=ingeredient_ids, statut="APPROVED")
+        else:
+            spoil_ingredients = get_objet_summary(
+                Procurements, start_date, end_date).filter(statut="APPROVED")
+        total_price = 0
+        for spoil_ingredient in spoil_ingredients:
+            total_price += spoil_ingredient.total_price
+
+        serializer = self.serializer_class(data={"number_items": len(spoil_ingredients),
+                                                 "total_price": total_price})
+
+        return response.Response(serializer.initial_data, status=status.HTTP_200_OK)
 
 
 class ValidationAPIView(generics.CreateAPIView):

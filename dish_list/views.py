@@ -1,5 +1,7 @@
-from django.shortcuts import render
-from rest_framework import viewsets, filters, generics, mixins, response, status
+from datetime import timedelta
+from helpers.utils import get_objet_summary
+from django.utils import timezone
+from rest_framework import viewsets, filters, generics, response, status
 from dish_list import serializers
 from dish_list.models import DishResult, DishListResult
 from helpers import permissions
@@ -21,8 +23,8 @@ class DishResultViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     search_fields = ['id', 'comment',
                      'statut', 'start_date', 'end_date',
                      'added_by__first_name', 'added_by__last_name',
-                     'dishlistresult_set__dish_name', 'dishlistresult_set__dish_quantity',
-                     'dishlistresult_set__dish_id']
+                     'dishlistresult__dish_name', 'dishlistresult__dish_quantity',
+                     'dishlistresult__dish_id']
     detail_serializer_class = serializers.DishResultDetailsSerializer
     serializer_class = serializers.DishResultSerializer
 
@@ -64,6 +66,32 @@ class DishListResultListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return DishListResult.objects.all()
+
+
+class DishResultSummaryAPIView(generics.ListAPIView):
+
+    permission_classes = (permissions.IsAuthenficatedOnly,)
+    serializer_class = serializers.DishListResultSerializer
+
+    def get(self, request, *args, **kwargs):
+        start_date = request.GET.get(
+            'start_date', timezone.now()-timedelta(hours=8))
+        end_date = request.GET.get('end_date', timezone.now())
+        dish_ids = request.GET.get('dish_ids', '')
+        if dish_ids:
+            dish_results = get_objet_summary(DishResult, start_date, end_date).filter(
+                dishlistresult__dish_id__in=dish_ids, statut="APPROVED")
+        else:
+            dish_results = get_objet_summary(
+                DishResult, start_date, end_date).filter(statut="APPROVED")
+        total_price = 0
+        for dish_result in dish_results:
+            total_price += dish_result.total_price
+
+        serializer = self.serializer_class(data={"number_items": len(dish_results),
+                                                 "total_price": total_price})
+
+        return response.Response(serializer.initial_data, status=status.HTTP_200_OK)
 
 
 class ValidationAPIView(generics.CreateAPIView):

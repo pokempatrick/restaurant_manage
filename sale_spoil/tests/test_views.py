@@ -117,7 +117,7 @@ class TestSaleViews(TestCase):
     def test_get_summary(self):
         response = self.client.get(
             self.sale_url +
-            f'summary/?start_date=2022-05-13T00:00TZ&dishes={json.dumps([1,2])}',
+            f'summary/?start_date=2022-05-13T00:00TZ&dish_ids={json.dumps([1,2])}',
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_accountant.token}'},
             content_type="application/json"
         )
@@ -276,6 +276,15 @@ class TestSpoilDishViews(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_get_summary_spoil_dish(self):
+        response = self.client.get(
+            self.spoil_dish_url +
+            f'summary/?start_date=2022-05-13T00:00TZ&dish_ids={json.dumps([1,2])}',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_coocker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_get_list_spoil_dish(self):
         response = self.client.get(
             self.spoil_dish_url,
@@ -398,6 +407,15 @@ class TestSpoilIngredientViews(TestCase):
     def test_get_spoil_ingredient(self):
         response = self.client.get(
             self.spoil_ingredient_url+f'{self.spoil_ingredient.id}/',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_coocker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_summary_spoil_ingredient(self):
+        response = self.client.get(
+            self.spoil_ingredient_url +
+            f'summary/?start_date=2022-05-13T00:00TZ&ingredient_ids={json.dumps([1,2])}',
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_coocker.token}'},
             content_type="application/json"
         )

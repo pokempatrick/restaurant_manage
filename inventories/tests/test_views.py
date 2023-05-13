@@ -3,7 +3,7 @@ from django.urls import reverse
 import json
 from rest_framework import status
 from authentification.models import User
-from dishes.models import ItemIngredients
+from dishes.models import ItemIngredients, Ingredient
 from inventories.models import Inventories
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -47,6 +47,24 @@ class TestInventoriesViews(TestCase):
             added_by=self.user_technician,
         )
         self.inventories.itemingredients_set.add(self.item_ingredient)
+
+        """ inventory setup for summary """
+        self.inventories_approved = Inventories.objects.create(
+            comment="Test de fonctionnement",
+            added_by=self.user_technician,
+            statut="APPROVED"
+        )
+        self.inventories_approved.itemingredients_set.add(
+            ItemIngredients.objects.create(
+                ingredient_name="tomate rouge",
+                quantity=20,
+                unit_price=1000,
+                ingredient_id=Ingredient.objects.create(
+                    name="oignoin",
+                    description="une très bonne sauce",
+                    unit_price=100,
+                    measure_unit="kg",).id
+            ))
 
     def test_create_inventories(self):
         response = self.client.post(
@@ -94,6 +112,15 @@ class TestInventoriesViews(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.data["statut"], "SUBMITTED")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_summary_inventories(self):
+        response = self.client.get(
+            self.inventories_url +
+            f'summary/?start_date=2022-05-13T00:00TZ&ingredient_ids={json.dumps([1,2])}',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_inventories(self):

@@ -48,17 +48,17 @@ class SaleViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
         start_date = request.GET.get(
             'start_date', timezone.now()-timedelta(hours=8))
         end_date = request.GET.get('end_date', timezone.now())
-        dishes = request.GET.get('dishes', '')
-        if dishes:
+        dish_ids = request.GET.get('dish_ids', '')
+        if dish_ids:
             sales = get_objet_summary(Sale, start_date, end_date).filter(
-                dishlist__dish_id__in=dishes)
+                dishlist__dish_id__in=dish_ids)
         else:
             sales = get_objet_summary(Sale, start_date, end_date)
         total_price = 0
         for sale in sales:
             total_price += sale.total_price
 
-        serializer = self.serializer_class(data={"number": len(sales),
+        serializer = self.serializer_class(data={"number_items": len(sales),
                                                  "total_price": total_price})
 
         return response.Response(serializer.initial_data, status=status.HTTP_200_OK)
@@ -87,6 +87,26 @@ class SpoilDishViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
         self.permission_classes = (permissions.IsUserOwnerOrReadOnly,)
         return super().destroy(request, *args, **kwargs)
 
+    @action(detail=False, methods=['get'], url_name='spoil_dish_summary')
+    def summary(self, request):
+        start_date = request.GET.get(
+            'start_date', timezone.now()-timedelta(hours=8))
+        end_date = request.GET.get('end_date', timezone.now())
+        dish_ids = request.GET.get('dish_ids', '')
+        if dish_ids:
+            spoil_dishes = get_objet_summary(SpoilDish, start_date, end_date).filter(
+                dishlist__dish_id__in=dish_ids)
+        else:
+            spoil_dishes = get_objet_summary(SpoilDish, start_date, end_date)
+        total_price = 0
+        for spoil_dish in spoil_dishes:
+            total_price += spoil_dish.total_price
+
+        serializer = self.serializer_class(data={"number_items": len(spoil_dishes),
+                                                 "total_price": total_price})
+
+        return response.Response(serializer.initial_data, status=status.HTTP_200_OK)
+
 
 class SpoilIngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     permission_classes = (permissions.IsAuthenficatedOnly,
@@ -110,3 +130,24 @@ class SpoilIngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     def destroy(self, request, *args, **kwargs):
         self.permission_classes = (permissions.IsUserOwnerOrReadOnly,)
         return super().destroy(request, *args, **kwargs)
+
+    @action(detail=False, methods=['get'], url_name='spoil_dish_summary')
+    def summary(self, request):
+        start_date = request.GET.get(
+            'start_date', timezone.now()-timedelta(hours=8))
+        end_date = request.GET.get('end_date', timezone.now())
+        ingeredient_ids = request.GET.get('ingeredient_ids', '')
+        if ingeredient_ids:
+            spoil_ingredients = get_objet_summary(SpoilIngredient, start_date, end_date).filter(
+                itemingredients__ingredient_id__in=ingeredient_ids)
+        else:
+            spoil_ingredients = get_objet_summary(
+                SpoilIngredient, start_date, end_date)
+        total_price = 0
+        for spoil_ingredient in spoil_ingredients:
+            total_price += spoil_ingredient.total_price
+
+        serializer = self.serializer_class(data={"number_items": len(spoil_ingredients),
+                                                 "total_price": total_price})
+
+        return response.Response(serializer.initial_data, status=status.HTTP_200_OK)

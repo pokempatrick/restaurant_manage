@@ -20,8 +20,6 @@ class ItemIngredientRoots(TrakingModel):
     ingredient_id = models.CharField(max_length=255, null=False, blank=False)
     quantity = models.IntegerField(
         validators=[MinValueValidator(limit_value=0)])
-    dish_list_result = models.ForeignKey(
-        DishListResult, on_delete=models.CASCADE, blank=True, null=True)
 
 
 class ItemIngredients(ItemIngredientRoots):
@@ -36,6 +34,8 @@ class ItemIngredients(ItemIngredientRoots):
         SpoilIngredient, on_delete=models.CASCADE, blank=True, null=True)
     inventory = models.ForeignKey(
         Inventories, on_delete=models.CASCADE, blank=True, null=True)
+    dish_list_result = models.ForeignKey(
+        DishListResult, on_delete=models.CASCADE, blank=True, null=True)
 
     @property
     def total_price(self):

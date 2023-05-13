@@ -7,7 +7,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from authentification.models import User
 from dish_list.models import DishResult, DishListResult
-from dishes.models import ItemIngredientRoots
+from dishes.models import ItemIngredients
 from datetime import timedelta, datetime
 from django.conf import settings
 from dish_list.constant import DISHLISTSTATUTHUMAN
@@ -51,6 +51,17 @@ class TestDishResultViews(TestCase):
         self.dish_list_result = self.dish_result.dishlistresult_set.create(
             dish_name="sauce tomate",
             dish_quantity=20,
+        )
+
+        """ dish_result setup for summary """
+        self.dish_result_approved = DishResult.objects.create(
+            statut="APPROVED",
+            comment="everything is ok")
+        DishListResult.objects.create(
+            dish_name="riz sauce tomate",
+            dish_quantity=20,
+            dish_result=self.dish_result_approved,
+            dish_id=1,
         )
 
     def test_create_dish_result(self):
@@ -127,6 +138,15 @@ class TestDishResultViews(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_get_summary_dish_list(self):
+        response = self.client.get(
+            self.dish_result_url +
+            f'summary/?start_date=2022-05-13T00:00TZ&dish_ids={json.dumps([1,2])}',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_technician.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_delete_dish_result(self):
         response = self.client.delete(
             self.dish_result_url+f'{self.dish_result.id}/',
@@ -154,10 +174,11 @@ class TestDishResultViews(TestCase):
                 "dish_name": "sauce tomate",
                 "dish_quantity": 20,
                 "dish_id": 5,
-                "itemingredientroots_set": [{
+                "itemingredients_set": [{
                     "ingredient_name": "tomate",
                     "quantity": 200,
                     "ingredient_id": 1,
+                    "unit_price": 250,
                 }],
             }),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
@@ -192,9 +213,10 @@ class TestDishListResultView(TestCase):
             role_name="ROLE_TECHNICIAN"
         )
 
-        self.item_ingredient_root = ItemIngredientRoots.objects.create(
+        self.item_ingredient_root = ItemIngredients.objects.create(
             ingredient_name="tomate rouge",
-            quantity=250,
+            quantity=2,
+            unit_price=100,
         )
         self.dish_result = DishResult.objects.create(
             comment="Test de fonctionnement",
@@ -206,7 +228,7 @@ class TestDishListResultView(TestCase):
             dish_result=self.dish_result
         )
 
-        self.dish_list_result.itemingredientroots_set.add(
+        self.dish_list_result.itemingredients_set.add(
             self.item_ingredient_root)
         self.dish_list_result_with_non_editatble_dish_result = DishListResult.objects.create(
             dish_name="sauce tomate",
@@ -239,15 +261,17 @@ class TestDishListResultView(TestCase):
                 "dish_name": "sauce tomate",
                 "dish_quantity": 30,
                 "dish_id": 4,
-                "itemingredientroots_set": [{
+                "itemingredients_set": [{
                     "id": 1,
                     "ingredient_name": "haricot",
                     "ingredient_id": 1,
                     "quantity": 200,
+                    "unit_price": 250,
                 }, {
                     "ingredient_name": "tomate",
                     "quantity": 20,
                     "ingredient_id": 2,
+                    "unit_price": 250,
                 },],
                 "dish_result": self.dish_result.id,
             }),
@@ -261,12 +285,13 @@ class TestDishListResultView(TestCase):
             self.dish_list_result_url+f'{self.dish_list_result.id}/',
             json.dumps({
                 "dish_quantity": 10,
-                "itemingredientroots_set": [{
+                "itemingredients_set": [{
                     "id": 1,
                     "ingredient_id": 1,
                     "quantity": 200,
                 }, {
                     "quantity": 20,
+                    "unit_price": 250,
                     "ingredient_id": 2,
                 },],
             }),
@@ -332,10 +357,11 @@ class TestValidationsView(TestCase):
             dish_name="sauce tomate",
             dish_quantity=20,
             dish_result=self.dish_result_submitted
-        ).itemingredientroots_set.add(
-            ItemIngredientRoots.objects.create(
+        ).itemingredients_set.add(
+            ItemIngredients.objects.create(
                 ingredient_name="tomate rouge",
-                quantity=250,
+                quantity=2,
+                unit_price=300
             ))
 
         self.validation_url_dish_result_created = reverse(

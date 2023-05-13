@@ -9,6 +9,8 @@ router.register('dish_result', views.DishResultViewSet, basename='dish_result')
 urlpatterns = [
     path('dish_result/<str:pk>/validations/',
          views.ValidationAPIView.as_view(), name='validations_dish_result'),
+    path('dish_result/summary/',
+         views.DishResultSummaryAPIView.as_view(), name='dish_result_summary'),
     path('dish_list_result/<str:pk>/',
          views.DishListResultAPIRUDView.as_view(), name='dish_list_result'),
     path('dish_list_result/',

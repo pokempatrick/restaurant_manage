@@ -1,5 +1,9 @@
 from rest_framework import viewsets, filters, generics, response, status
+from django.utils import timezone
+from datetime import timedelta
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from helpers.utils import get_objet_summary
 from inventories import serializers
 from inventories.models import Inventories
 from helpers import permissions
@@ -31,6 +35,27 @@ class InventoriesViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
     def destroy(self, request, *args, **kwargs):
         self.permission_classes = (permissions.IsUserOwnerOrReadOnly,)
         return super().destroy(request, *args, **kwargs)
+
+    @action(detail=False, methods=['get'], url_name='inventories_summary')
+    def summary(self, request):
+        start_date = request.GET.get(
+            'start_date', timezone.now()-timedelta(hours=8))
+        end_date = request.GET.get('end_date', timezone.now())
+        ingredient_ids = request.GET.get('ingredient_ids', '')
+        if ingredient_ids:
+            inventories = get_objet_summary(Inventories, start_date, end_date).filter(
+                itemingredients__ingredient_id__in=ingredient_ids, statut="APPROVED")
+        else:
+            inventories = get_objet_summary(
+                Inventories, start_date, end_date).filter(statut="APPROVED")
+        total_price = 0
+        for inventory in inventories:
+            total_price += inventory.total_price
+
+        serializer = self.serializer_class(data={"number_items": len(inventories),
+                                                 "total_price": total_price})
+
+        return response.Response(serializer.initial_data, status=status.HTTP_200_OK)
 
 
 class ValidationAPIView(generics.CreateAPIView):
