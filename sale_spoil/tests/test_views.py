@@ -3,7 +3,7 @@ from django.urls import reverse
 import json
 from rest_framework import status
 from authentification.models import User
-from dishes.models import ItemIngredients
+from dishes.models import ItemIngredients, Ingredient, Dish
 from sale_spoil.models import Sale, SpoilIngredient, SpoilDish, DishList
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
@@ -52,10 +52,13 @@ class TestSaleViews(TestCase):
         )
         self.dish_list = DishList.objects.create(
             dish_name="Ndolé",
-            dish_id=1,
             dish_quantity=1,
             unit_price=1000,
             sale=self.sale,
+            dish_id=Dish.objects.create(
+                description="riz sauce bolonaise",
+                name="Riz sauce arachide",
+                unit_price=1500,).id,
         )
 
     def test_create_sale(self):
@@ -198,10 +201,13 @@ class TestSpoilDishViews(TestCase):
         )
         self.dish_list = DishList.objects.create(
             dish_name="Ndolé",
-            dish_id=1,
             dish_quantity=1,
             unit_price=1000,
             spoil_dish=self.spoil_dish,
+            dish_id=Dish.objects.create(
+                description="riz sauce bolonaise",
+                name="Riz sauce arachide",
+                unit_price=1500,).id,
         )
 
     def test_create_spoil_dish(self):
@@ -354,7 +360,13 @@ class TestSpoilIngredientViews(TestCase):
             ingredient_name="tomate rouge",
             quantity=25,
             unit_price=100,
-            ingredient_id=2,
+            ingredient_id=Ingredient.objects.create(
+                description="De la viande de boeuf en kg",
+                name="Viande de boeuf",
+                unit_price=3500,
+                measure_unit="kg",
+                group="MEET",
+            ).id,
             spoil_ingredient=self.spoil_ingredient,
         )
 

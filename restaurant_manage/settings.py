@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     'dish_list',
     'sale_spoil',
     'inventories',
+    'stocks',
 ]
 
 MIDDLEWARE = [

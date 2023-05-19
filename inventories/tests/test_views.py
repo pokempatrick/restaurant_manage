@@ -191,7 +191,14 @@ class TestValidationsView(TestCase):
             ingredient_name="tomate rouge",
             quantity=5,
             unit_price=500,
-            inventory=self.inventories_submitted
+            inventory=self.inventories_submitted,
+            ingredient_id=Ingredient.objects.create(
+                description="De la viande de boeuf en kg",
+                name="Viande de boeuf",
+                unit_price=3500,
+                measure_unit="kg",
+                group="MEET",
+            ).id
         )
 
         self.validation_url_inventories_created = reverse(

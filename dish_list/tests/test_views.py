@@ -7,7 +7,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from authentification.models import User
 from dish_list.models import DishResult, DishListResult
-from dishes.models import ItemIngredients
+from dishes.models import ItemIngredients, Dish, Ingredient
 from datetime import timedelta, datetime
 from django.conf import settings
 from dish_list.constant import DISHLISTSTATUTHUMAN
@@ -51,6 +51,21 @@ class TestDishResultViews(TestCase):
         self.dish_list_result = self.dish_result.dishlistresult_set.create(
             dish_name="sauce tomate",
             dish_quantity=20,
+            dish_id=Dish.objects.create(description="riz sauce bolonaise",
+                                        name="Riz sauce arachide",
+                                        unit_price=1500,).id
+        )
+        self.dish_list_result.itemingredients_set.create(
+            ingredient_name="tomate rouge",
+            quantity=2,
+            unit_price=100,
+            ingredient_id=Ingredient.objects.create(
+                description="De la viande de boeuf en kg",
+                name="Viande de boeuf",
+                unit_price=3500,
+                measure_unit="kg",
+                group="MEET",
+            ).id
         )
 
         """ dish_result setup for summary """

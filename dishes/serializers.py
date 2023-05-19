@@ -49,7 +49,7 @@ class IngredientDetailsSerializer(serializers.ModelSerializer):
 class IngredientListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('name', 'unit_price', 'created_at')
+        fields = ('name', 'unit_price', 'created_at', 'group')
 
 
 class ValidationSerializer(serializers.ModelSerializer):

@@ -52,4 +52,5 @@ urlpatterns = [
     path('api/', include('dish_list.urls')),
     path('api/', include('sale_spoil.urls')),
     path('api/', include('inventories.urls')),
+    path('api/', include('stocks.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

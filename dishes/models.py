@@ -26,6 +26,7 @@ class ItemIngredients(ItemIngredientRoots):
 
     unit_price = models.IntegerField(
         validators=[MinValueValidator(limit_value=0),])
+    ingredient_stock = models.IntegerField(blank=True, null=True, default=0)
     dish_budget = models.ForeignKey(
         DishBudgets, on_delete=models.CASCADE, blank=True, null=True)
     procurement = models.ForeignKey(
@@ -43,6 +44,14 @@ class ItemIngredients(ItemIngredientRoots):
 
     def __str__(self) -> str:
         return f'{self.total_price} - {self.unit_price} - {self.dish_budget} '
+
+    @property
+    def gap(self):
+        return self.quantity - self.ingredient_stock
+
+    @property
+    def total_lost(self):
+        return -self.unit_price * self.gap
 
 
 class Ingredient(RootModel):

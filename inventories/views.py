@@ -48,12 +48,13 @@ class InventoriesViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
         else:
             inventories = get_objet_summary(
                 Inventories, start_date, end_date).filter(statut="APPROVED")
-        total_price = 0
+
+        total_lost = 0
         for inventory in inventories:
-            total_price += inventory.total_price
+            total_lost += inventory.total_lost
 
         serializer = self.serializer_class(data={"number_items": len(inventories),
-                                                 "total_price": total_price})
+                                                 "total_lost": total_lost})
 
         return response.Response(serializer.initial_data, status=status.HTTP_200_OK)
 

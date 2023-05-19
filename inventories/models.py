@@ -26,3 +26,11 @@ class Inventories(TrakingModel):
         for item_ingredient in item_ingredient_list:
             total += item_ingredient.total_price
         return total
+
+    @property
+    def total_lost(self):
+        item_ingredient_list = self.itemingredients_set.all()
+        total = 0
+        for item_ingredient in item_ingredient_list:
+            total += item_ingredient.total_lost
+        return total
