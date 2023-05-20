@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters, response, status
+from rest_framework import viewsets, filters, response, status, generics
 from rest_framework.decorators import action
 from django.utils import timezone
 from datetime import timedelta
@@ -8,6 +8,7 @@ from sale_spoil.models import SpoilDish, SpoilIngredient, Sale
 from helpers import permissions
 from sale_spoil.permissions import IsAccountable, IsEditable
 from helpers.view import CreateUpdateMixin
+from sale_spoil.utils import root_query_summary
 
 # Create your views here.
 
@@ -151,3 +152,21 @@ class SpoilIngredientViewSet(CreateUpdateMixin, viewsets.ModelViewSet, ):
                                                  "total_price": total_price})
 
         return response.Response(serializer.initial_data, status=status.HTTP_200_OK)
+
+
+class DishListSummaryView(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenficatedOnly,)
+    filter_backends = (filters.SearchFilter,)
+    filterset_field = ['dish_id', 'dish_name', ]
+    search_fields = ['dish_name']
+
+    serializer_class = serializers.DishListSummarySerializer
+
+    def get_queryset(self):
+        start_date = self.request.GET.get(
+            'start_date', timezone.now()-timedelta(hours=24))
+        end_date = self.request.GET.get('end_date', timezone.now())
+        process = self.request.GET.get('process', 'sale')
+        return root_query_summary(start_date=start_date,
+                                  end_date=end_date,
+                                  process=process)

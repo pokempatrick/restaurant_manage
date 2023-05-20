@@ -15,10 +15,10 @@ class TestModel(APITestCase):
         )
 
     def test_create_spoil_ingredient(self):
-        spoil_ingredient = Inventories.objects.create(
+        inventory = Inventories.objects.create(
             comment="mauvaise conservation"
         )
-        spoil_ingredient.itemingredients_set.add(self.item_ingredient)
+        inventory.itemingredients_set.add(self.item_ingredient)
 
-        self.assertIsInstance(spoil_ingredient, Inventories)
-        self.assertEqual(spoil_ingredient.total_price, 7000)
+        self.assertIsInstance(inventory, Inventories)
+        self.assertEqual(inventory.total_price, 7000)

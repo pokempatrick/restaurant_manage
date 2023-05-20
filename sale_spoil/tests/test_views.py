@@ -456,3 +456,56 @@ class TestSpoilIngredientViews(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class TestDishListSummaryView(TestCase):
+    @classmethod
+    def setUp(self):
+        self.client = Client()
+        self.dish_summary_url = reverse('dish_summary')
+        # creation d'un utilisateur
+        self.user_cooker = User.objects.create(
+            username='cyrce',
+            email='cyretruly@gmail.com',
+            first_name="john",
+            last_name="does",
+            password='1234password',
+            role_name="ROLE_COOKER"
+        )
+        self.sale = Sale.objects.create(
+            customer_first_name="John",
+            customer_last_name="Does"
+        )
+        DishList.objects.create(
+            dish_name="Ndolé",
+            dish_quantity=1,
+            unit_price=1000,
+            sale=self.sale,
+            dish_id=1
+        )
+        DishList.objects.create(
+            dish_name="Ndolé",
+            dish_quantity=3,
+            unit_price=1000,
+            sale=self.sale,
+            dish_id=1
+        )
+        DishList.objects.create(
+            dish_name="Macabo raper",
+            dish_quantity=4,
+            unit_price=1000,
+            sale=self.sale,
+            dish_id=2
+        )
+
+    def test_get_dish_list_summary(self):
+        response = self.client.get(
+            self.dish_summary_url+f'?start_date=2022-05-13T00:00TZ',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(response.data['results'][0],
+                         {"dish_name": "Macabo raper",
+                          "occurences": 1, "total_cost": 4000,
+                          "total_quantity": 4})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

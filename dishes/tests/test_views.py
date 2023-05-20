@@ -1,9 +1,11 @@
 from django.test import TestCase, Client
+from django.db.models import Sum, F
 from django.urls import reverse
 import json
 from rest_framework import status
 from authentification.models import User
 from dishes.models import Dish, Ingredient, ItemIngredients
+from inventories.models import Inventories
 
 
 class DishView(TestCase):
@@ -216,6 +218,7 @@ class ItemIngredientView(TestCase):
 
         self.client = Client()
         self.item_ingredient_url = reverse('item_ingredient')
+        self.item_ingredient_summary_url = reverse('item_ingredient_summary')
         # creation d'un utilisateur
         self.user_cooker = User.objects.create(
             username='cyrce',
@@ -226,9 +229,27 @@ class ItemIngredientView(TestCase):
             role_name="ROLE_COOKER"
         )
 
+        self.inventory = Inventories.objects.create(
+            comment="mauvaise conservation",
+            statut='APPROVED'
+        )
         ItemIngredients.objects.create(
             ingredient_name="tomate rouge",
             quantity=25,
+            ingredient_id=1,
+            inventory=self.inventory,
+            unit_price=300,)
+        ItemIngredients.objects.create(
+            ingredient_name="tomate rouge",
+            ingredient_id=1,
+            quantity=30,
+            inventory=self.inventory,
+            unit_price=100,)
+        ItemIngredients.objects.create(
+            ingredient_name="tomate rouge 2",
+            ingredient_id=2,
+            quantity=70,
+            inventory=self.inventory,
             unit_price=100,)
 
     def test_get_list_item_ingredient(self):
@@ -237,4 +258,15 @@ class ItemIngredientView(TestCase):
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
             content_type="application/json"
         )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_item_ingredient_summary(self):
+        response = self.client.get(
+            self.item_ingredient_summary_url+f'?start_date=2022-05-13T00:00TZ',
+            **{'HTTP_AUTHORIZATION': f'Bearer {self.user_cooker.token}'},
+            content_type="application/json"
+        )
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(response.data['results'][0], {"ingredient_name": "tomate rouge 2",
+                         "total_quantity": 70, "total_ingredient_stock": 0, "occurences": 1})
         self.assertEqual(response.status_code, status.HTTP_200_OK)

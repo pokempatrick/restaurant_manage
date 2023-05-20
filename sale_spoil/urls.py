@@ -7,5 +7,8 @@ router.register('sale', views.SaleViewSet, basename='sale')
 router.register('spoil-dish', views.SpoilDishViewSet, basename='spoil-dish')
 router.register('spoil-ingredient', views.SpoilIngredientViewSet,
                 basename='spoil-ingredient')
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('dish-summary/',
+         views.DishListSummaryView.as_view(), name='dish_summary'),
+]
+urlpatterns += router.urls

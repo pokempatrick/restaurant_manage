@@ -1,7 +1,8 @@
+from django.db.models import Sum, Count
 from datetime import timedelta
 from helpers.utils import get_objet_summary
 from django.utils import timezone
-from rest_framework import viewsets, filters, generics, response, status
+from rest_framework import viewsets, filters, generics, response, status, request
 from dish_list import serializers
 from dish_list.models import DishResult, DishListResult
 from helpers import permissions
@@ -66,6 +67,29 @@ class DishListResultListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         return DishListResult.objects.all()
+
+
+# class DishListResultListSummaryView(generics.ListAPIView):
+#     permission_classes = (permissions.IsAuthenficatedOnly,)
+#     filter_backends = (filters.SearchFilter,)
+#     filterset_field = ['dish_id', 'dish_name', ]
+#     search_fields = ['dish_name']
+
+#     serializer_class = serializers.DishListResultSummarySerializer
+
+#     def get_queryset(self):
+#         start_date = self.request.GET.get(
+#             'start_date', timezone.now()-timedelta(hours=24))
+#         end_date = self.request.GET.get('end_date', timezone.now())
+
+#         return DishListResult.objects.filter(
+#             created_at__gte=start_date,
+#             created_at__lte=end_date,
+#             dish_result__statut='APPROVED'
+#         ).values(
+#             "dish_name").annotate(
+#             total_quantity=Sum("dish_quantity"),
+#             occurences=Count("dish_id")).order_by("-dish_id")
 
 
 class DishResultSummaryAPIView(generics.ListAPIView):

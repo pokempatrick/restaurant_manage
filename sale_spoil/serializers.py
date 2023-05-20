@@ -137,3 +137,14 @@ class SpoilIngredientPostSerializer(TrackingSerializer):
     class Meta:
         model = SpoilIngredient
         fields = '__all__'
+
+
+class DishListSummarySerializer(serializers.ModelSerializer):
+
+    total_quantity = serializers.IntegerField()
+    total_cost = serializers.IntegerField()
+    occurences = serializers.IntegerField()
+
+    class Meta:
+        model = DishList
+        fields = ('dish_name', 'occurences', 'total_cost', 'total_quantity')

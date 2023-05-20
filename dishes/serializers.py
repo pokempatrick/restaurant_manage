@@ -79,3 +79,14 @@ class ItemIngredientRootsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemIngredientRoots
         fields = ('ingredient_name', 'quantity')
+
+
+class ItemIngredientsSummarySerializer(serializers.ModelSerializer):
+    total_quantity = serializers.IntegerField()
+    total_ingredient_stock = serializers.IntegerField()
+    occurences = serializers.IntegerField()
+
+    class Meta:
+        model = ItemIngredients
+        fields = ('ingredient_name', 'total_quantity',
+                  'total_ingredient_stock', 'occurences')
