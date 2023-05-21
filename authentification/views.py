@@ -148,6 +148,19 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(
             user,
             data=request.data,
+            context={"request": request}
+        )
+        if serializer.is_valid():
+            serializer.save(updated_by=self.request.user.first_name)
+            return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.serializer_class(
+            user,
+            data=request.data,
             partial=True,
             context={"request": request}
         )

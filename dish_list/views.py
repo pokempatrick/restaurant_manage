@@ -69,29 +69,6 @@ class DishListResultListAPIView(generics.ListAPIView):
         return DishListResult.objects.all()
 
 
-# class DishListResultListSummaryView(generics.ListAPIView):
-#     permission_classes = (permissions.IsAuthenficatedOnly,)
-#     filter_backends = (filters.SearchFilter,)
-#     filterset_field = ['dish_id', 'dish_name', ]
-#     search_fields = ['dish_name']
-
-#     serializer_class = serializers.DishListResultSummarySerializer
-
-#     def get_queryset(self):
-#         start_date = self.request.GET.get(
-#             'start_date', timezone.now()-timedelta(hours=24))
-#         end_date = self.request.GET.get('end_date', timezone.now())
-
-#         return DishListResult.objects.filter(
-#             created_at__gte=start_date,
-#             created_at__lte=end_date,
-#             dish_result__statut='APPROVED'
-#         ).values(
-#             "dish_name").annotate(
-#             total_quantity=Sum("dish_quantity"),
-#             occurences=Count("dish_id")).order_by("-dish_id")
-
-
 class DishResultSummaryAPIView(generics.ListAPIView):
 
     permission_classes = (permissions.IsAuthenficatedOnly,)
