@@ -1,6 +1,6 @@
 from rest_framework.test import APITestCase
 from sale_spoil.models import DishList, SpoilIngredient, Sale, SpoilDish
-from dishes.models import ItemIngredients
+from dishes.models import ItemIngredients, Dish
 from datetime import datetime
 
 
@@ -20,7 +20,10 @@ class TestModel(APITestCase):
             unit_price=200,
             dish_name="pomme pilé",
             dish_quantity=5,
-            dish_id=14
+            dish_id=Dish.objects.create(
+                description="pomme pilé de chez nous",
+                name="pomme pilé",
+                unit_price=1500,).id,
         )
         self.assertIsInstance(dish_list, DishList)
         self.assertEqual(dish_list.total_price, 1000)
@@ -34,7 +37,10 @@ class TestModel(APITestCase):
             unit_price=1000,
             dish_name="pomme pilé",
             dish_quantity=2,
-            dish_id=14,
+            dish_id=Dish.objects.create(
+                description="pomme pilé de chez nous",
+                name="pomme pilé",
+                unit_price=1500,).id,
             sale=sale,
         )
         self.assertIsInstance(sale, Sale)
@@ -57,7 +63,10 @@ class TestModel(APITestCase):
             unit_price=1000,
             dish_name="pomme pilé",
             dish_quantity=2,
-            dish_id=14,
+            dish_id=Dish.objects.create(
+                description="pomme pilé de chez nous",
+                name="pomme pilé",
+                unit_price=1500,).id,
             spoil_dish=spoil_dish,
         )
         self.assertIsInstance(spoil_dish, SpoilDish)

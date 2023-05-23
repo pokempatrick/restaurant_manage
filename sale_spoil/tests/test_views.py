@@ -5,7 +5,7 @@ from rest_framework import status
 from authentification.models import User
 from dishes.models import ItemIngredients, Ingredient, Dish
 from sale_spoil.models import Sale, SpoilIngredient, SpoilDish, DishList
-from django.conf import settings
+from stocks.models import Stocks
 from django.core.serializers.json import DjangoJSONEncoder
 
 
@@ -50,15 +50,16 @@ class TestSaleViews(TestCase):
             customer_first_name="John",
             customer_last_name="Does"
         )
+        self.dish = Dish.objects.create(
+            description="riz sauce bolonaise",
+            name="Riz sauce arachide",
+            unit_price=1500,)
         self.dish_list = DishList.objects.create(
             dish_name="Ndolé",
             dish_quantity=1,
             unit_price=1000,
             sale=self.sale,
-            dish_id=Dish.objects.create(
-                description="riz sauce bolonaise",
-                name="Riz sauce arachide",
-                unit_price=1500,).id,
+            dish_id=self.dish.id,
         )
 
     def test_create_sale(self):
@@ -71,13 +72,14 @@ class TestSaleViews(TestCase):
                     "dish_name": "Ndolé",
                     "dish_quantity": 2,
                     "unit_price": 1000,
-                    "dish_id": 1,
+                    "dish_id": self.dish.id,
                 }],
             }, cls=DjangoJSONEncoder),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_accountant.token}'},
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Stocks.objects.get(dish=self.dish).quantity, -3)
 
     def test_update_sale(self):
         response = self.client.put(
@@ -89,13 +91,14 @@ class TestSaleViews(TestCase):
                     "dish_name": "Ndolé",
                     "dish_quantity": 2,
                     "unit_price": 1000,
-                    "dish_id": 1,
+                    "dish_id": self.dish.id,
                 }],
             }, cls=DjangoJSONEncoder),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_owner.token}'},
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Stocks.objects.get(dish=self.dish).quantity, -2)
 
     def test_partial_update_sale(self):
         response = self.client.patch(
@@ -106,6 +109,7 @@ class TestSaleViews(TestCase):
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_owner.token}'},
             content_type="application/json"
         )
+        self.assertEqual(Stocks.objects.get(dish=self.dish).quantity, -1)
         self.assertEqual(response.data["customer_first_name"], "Jeanne")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -199,15 +203,16 @@ class TestSpoilDishViews(TestCase):
             description="le premier essai",
             added_by=self.user_coocker_2,
         )
+        self.dish = Dish.objects.create(
+            description="riz sauce bolonaise",
+            name="Riz sauce arachide",
+            unit_price=1500,)
         self.dish_list = DishList.objects.create(
             dish_name="Ndolé",
             dish_quantity=1,
             unit_price=1000,
             spoil_dish=self.spoil_dish,
-            dish_id=Dish.objects.create(
-                description="riz sauce bolonaise",
-                name="Riz sauce arachide",
-                unit_price=1500,).id,
+            dish_id=self.dish.id,
         )
 
     def test_create_spoil_dish(self):
@@ -219,13 +224,14 @@ class TestSpoilDishViews(TestCase):
                     "dish_name": "Ndolé",
                     "dish_quantity": 2,
                     "unit_price": 1000,
-                    "dish_id": 1,
+                    "dish_id": self.dish.id,
                 }],
             }, cls=DjangoJSONEncoder),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_coocker.token}'},
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Stocks.objects.get(dish=self.dish).quantity, -3)
 
     def test_create_spoil_dish_with_wrong_role(self):
         response = self.client.post(
@@ -236,7 +242,7 @@ class TestSpoilDishViews(TestCase):
                     "dish_name": "Ndolé",
                     "dish_quantity": 2,
                     "unit_price": 1000,
-                    "dish_id": 1,
+                    "dish_id": self.dish.id,
                 }],
             }, cls=DjangoJSONEncoder),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_technician.token}'},
@@ -253,7 +259,7 @@ class TestSpoilDishViews(TestCase):
                     "dish_name": "Ndolé",
                     "dish_quantity": 2,
                     "unit_price": 1000,
-                    "dish_id": 1,
+                    "dish_id": self.dish.id,
                 }],
             }, cls=DjangoJSONEncoder),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_coocker.token}'},
@@ -261,6 +267,7 @@ class TestSpoilDishViews(TestCase):
         )
         self.assertEqual(response.data["description"], "test fonctionnel")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Stocks.objects.get(dish=self.dish).quantity, -2)
 
     def test_partial_update_spoil_dish(self):
         response = self.client.patch(
@@ -273,6 +280,7 @@ class TestSpoilDishViews(TestCase):
         )
         self.assertEqual(response.data["description"], "test fonctionnel 4")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Stocks.objects.get(dish=self.dish).quantity, -1)
 
     def test_get_spoil_dish(self):
         response = self.client.get(
@@ -356,17 +364,18 @@ class TestSpoilIngredientViews(TestCase):
             description="le premier essai",
             added_by=self.user_coocker_2,
         )
+        self.ingredient = Ingredient.objects.create(
+            description="De la viande de boeuf en kg",
+            name="Viande de boeuf",
+            unit_price=3500,
+            measure_unit="kg",
+            group="MEET",
+        )
         ItemIngredients.objects.create(
             ingredient_name="tomate rouge",
             quantity=25,
             unit_price=100,
-            ingredient_id=Ingredient.objects.create(
-                description="De la viande de boeuf en kg",
-                name="Viande de boeuf",
-                unit_price=3500,
-                measure_unit="kg",
-                group="MEET",
-            ).id,
+            ingredient_id=self.ingredient.id,
             spoil_ingredient=self.spoil_ingredient,
         )
 
@@ -379,13 +388,15 @@ class TestSpoilIngredientViews(TestCase):
                     "ingredient_name": "tomate",
                     "quantity": 2,
                     "unit_price": 1000,
-                    "ingredient_id": 1,
+                    "ingredient_id": self.ingredient.id,
                 }],
             }, cls=DjangoJSONEncoder),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_coocker.token}'},
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Stocks.objects.get(
+            ingredient=self.ingredient).quantity, -27)
 
     def test_update_spoil_ingredient(self):
         response = self.client.put(
@@ -396,13 +407,15 @@ class TestSpoilIngredientViews(TestCase):
                     "ingredient_name": "tomate",
                     "quantity": 5,
                     "unit_price": 1000,
-                    "ingredient_id": 1,
+                    "ingredient_id": self.ingredient.id,
                 }],
             }, cls=DjangoJSONEncoder),
             **{'HTTP_AUTHORIZATION': f'Bearer {self.user_technician.token}'},
             content_type="application/json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Stocks.objects.get(
+            ingredient=self.ingredient).quantity, -5)
 
     def test_partial_update_spoil_ingredient(self):
         response = self.client.patch(
@@ -415,6 +428,8 @@ class TestSpoilIngredientViews(TestCase):
         )
         self.assertEqual(response.data["description"], "test fonctionnel 4")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Stocks.objects.get(
+            ingredient=self.ingredient).quantity, -25)
 
     def test_get_spoil_ingredient(self):
         response = self.client.get(
@@ -476,26 +491,33 @@ class TestDishListSummaryView(TestCase):
             customer_first_name="John",
             customer_last_name="Does"
         )
+        self.dish = Dish.objects.create(
+            description="Ndolé de chez nous",
+            name="Ndolé",
+            unit_price=1500,)
         DishList.objects.create(
             dish_name="Ndolé",
             dish_quantity=1,
             unit_price=1000,
             sale=self.sale,
-            dish_id=1
+            dish_id=self.dish.id,
         )
         DishList.objects.create(
             dish_name="Ndolé",
             dish_quantity=3,
             unit_price=1000,
             sale=self.sale,
-            dish_id=1
+            dish_id=self.dish.id,
         )
         DishList.objects.create(
             dish_name="Macabo raper",
             dish_quantity=4,
             unit_price=1000,
             sale=self.sale,
-            dish_id=2
+            dish_id=Dish.objects.create(
+                description="Macabo raper de chez nous",
+                name="Macabo raper",
+                unit_price=1500,).id,
         )
 
     def test_get_dish_list_summary(self):

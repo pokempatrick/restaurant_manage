@@ -54,6 +54,8 @@ class BudgetsDetailsSerializer(serializers.ModelSerializer):
         read_only=True, default=None, many=True)
     validations_set = ValidationSerializer(
         read_only=True, default=None, many=True)
+    total_price = serializers.IntegerField(
+        read_only=True, default=None)
 
     class Meta:
         model = Budgets
@@ -67,6 +69,8 @@ class DishBudgetsDetailsSerializer(serializers.ModelSerializer):
     updated_by = RegisterSerilizer(
         read_only=True, default=None)
     budget = BudgetsSerializer(
+        read_only=True, default=None)
+    total_price = serializers.IntegerField(
         read_only=True, default=None)
 
     itemingredients_set = ItemIngredientsSerializer(many=True)

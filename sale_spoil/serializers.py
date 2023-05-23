@@ -13,7 +13,8 @@ class SaleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sale
-        fields = ('id', 'total_price', 'added_by', 'created_at', 'updated_at')
+        fields = ('id', 'total_price', 'added_by', 'customer_first_name',
+                  'created_at', 'updated_at')
 
 
 class SpoilDishSerializer(serializers.ModelSerializer):
@@ -38,7 +39,7 @@ class SpoilIngredientSerializer(serializers.ModelSerializer):
 
 class DishListSerializer(serializers.ModelSerializer):
 
-    added_by = RegisterSerilizer(
+    total_price = serializers.IntegerField(
         read_only=True, default=None)
 
     class Meta:
@@ -54,6 +55,8 @@ class SaleDetailsSerializer(serializers.ModelSerializer):
         read_only=True, default=None)
     dishlist_set = DishListSerializer(
         read_only=True, default=None, many=True)
+    total_price = serializers.IntegerField(
+        read_only=True, default=None)
 
     class Meta:
         model = Sale
@@ -68,6 +71,8 @@ class SpoilDishDetailsSerializer(serializers.ModelSerializer):
         read_only=True, default=None)
     dishlist_set = DishListSerializer(
         read_only=True, default=None, many=True)
+    total_price = serializers.IntegerField(
+        read_only=True, default=None)
 
     class Meta:
         model = SpoilDish
@@ -147,4 +152,5 @@ class DishListSummarySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DishList
-        fields = ('dish_name', 'occurences', 'total_cost', 'total_quantity')
+        fields = ('id', 'dish_name', 'occurences',
+                  'total_cost', 'total_quantity')

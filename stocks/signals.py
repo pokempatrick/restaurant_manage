@@ -1,12 +1,12 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save, post_delete, pre_save, pre_delete
+from django.db.models.signals import post_save, pre_save, pre_delete
 from django.shortcuts import get_object_or_404
 from procurement.models import Procurements
-from dishes.models import Ingredient, Dish
+from dishes.models import Ingredient, Dish, ItemIngredients
 from dish_list.models import DishResult
 from inventories.models import Inventories
 from stocks.models import Stocks
-from sale_spoil.models import Sale, SpoilDish, SpoilIngredient
+from sale_spoil.models import DishList
 
 
 def update_ingredient_quantity(added_number, ingredient):
@@ -14,8 +14,8 @@ def update_ingredient_quantity(added_number, ingredient):
     stock_ingredient = Stocks.objects.filter(ingredient=ingredient).first()
 
     if (stock_ingredient):
-        stock_ingredient.quantity = stock_ingredient.quantity + added_number
-        stock_ingredient.save
+        stock_ingredient.quantity += added_number
+        stock_ingredient.save()
     else:
         Stocks.objects.create(
             ingredient=ingredient,
@@ -28,8 +28,8 @@ def update_dish_quantity(added_number, dish):
     stock_dish = Stocks.objects.filter(dish=dish).first()
 
     if (stock_dish):
-        stock_dish.quantity = stock_dish.quantity + added_number
-        stock_dish.save
+        stock_dish.quantity += added_number
+        stock_dish.save()
     else:
         Stocks.objects.create(
             dish=dish,
@@ -76,82 +76,51 @@ def post_save_inventories(sender, instance, **kwargs):
             update_ingredient_quantity(item_ingredient.gap, ingredient)
 
 
-@receiver(pre_save, sender=Sale)
-def pre_save_sale(sender, instance, **kwargs):
-    """ update for sale """
-    if instance.id:
-        prev_instance = Sale.objects.filter(id=instance.id).first()
-        for dish_item in prev_instance.dishlist_set.all():
-            dish = get_object_or_404(
-                Dish, id=dish_item.dish_id)
-            update_dish_quantity(-dish_item.dish_quantity, dish)
-
-
-@receiver(post_save, sender=Sale)
-def post_save_sale(sender, instance, **kwargs):
-    for dish_item in instance.dishlist_set.all():
+@receiver(pre_save, sender=DishList)
+def pre_save_dish_list(sender, instance, **kwargs):
+    if instance.id and (bool(instance.sale or instance.spoil_dish)):
+        prev_instance = DishList.objects.filter(id=instance.id).first()
         dish = get_object_or_404(
-            Dish, id=dish_item.dish_id)
-        update_dish_quantity(dish_item.dish_quantity, dish)
+            Dish, id=instance.dish_id)
+        update_dish_quantity(prev_instance.dish_quantity, dish)
 
 
-@receiver(pre_delete, sender=Sale)
-def pre_delete_sale(sender, instance, **kwargs):
-    for dish_item in instance.dishlist_set.all():
+@receiver(post_save, sender=DishList)
+def post_save_dish_list(sender, instance, **kwargs):
+    if (bool(instance.sale or instance.spoil_dish)):
         dish = get_object_or_404(
-            Dish, id=dish_item.dish_id)
-        update_dish_quantity(-dish_item.dish_quantity, dish)
+            Dish, id=instance.dish_id)
+        update_dish_quantity(-instance.dish_quantity, dish)
 
 
-@receiver(pre_save, sender=SpoilDish)
-def pre_save_spoil_dish(sender, instance, **kwargs):
-    """ update for spoil dish """
-    if instance.id:
-        prev_instance = SpoilDish.objects.filter(id=instance.id).first()
-        for dish_item in prev_instance.dishlist_set.all():
-            dish = get_object_or_404(
-                Dish, id=dish_item.dish_id)
-            update_dish_quantity(-dish_item.dish_quantity, dish)
-
-
-@receiver(post_save, sender=SpoilDish)
-def post_save_spoil_dish(sender, instance, **kwargs):
-    for dish_item in instance.dishlist_set.all():
+@receiver(pre_delete, sender=DishList)
+def pre_delete_dish_list(sender, instance, **kwargs):
+    if (bool(instance.sale or instance.spoil_dish)):
         dish = get_object_or_404(
-            Dish, id=dish_item.dish_id)
-        update_dish_quantity(dish_item.dish_quantity, dish)
+            Dish, id=instance.dish_id)
+        update_dish_quantity(instance.dish_quantity, dish)
 
 
-@receiver(pre_delete, sender=SpoilDish)
-def pre_delete_spoil_dish(sender, instance, **kwargs):
-    for dish_item in instance.dishlist_set.all():
-        dish = get_object_or_404(
-            Dish, id=dish_item.dish_id)
-        update_dish_quantity(-dish_item.dish_quantity, dish)
-
-
-@receiver(pre_save, sender=SpoilIngredient)
+@receiver(pre_save, sender=ItemIngredients)
 def pre_save_spoil_ingredient(sender, instance, **kwargs):
-    """ update for spoil ingredient """
-    if instance.id:
-        prev_instance = SpoilIngredient.objects.filter(id=instance.id).first()
-        for item_ingredient in prev_instance.itemingredients_set.all():
-            dish = get_object_or_404(
-                Ingredient, id=item_ingredient.ingredient_id)
-            update_ingredient_quantity(-item_ingredient.quantity, dish)
+    if instance.id and bool(instance.spoil_ingredient):
+        prev_instance = ItemIngredients.objects.filter(id=instance.id).first()
+        ingredient = get_object_or_404(
+            Ingredient, id=instance.ingredient_id)
+        update_ingredient_quantity(prev_instance.quantity, ingredient)
 
 
-@receiver(post_save, sender=SpoilIngredient)
+@receiver(post_save, sender=ItemIngredients)
 def post_save_spoil_ingredient(sender, instance, **kwargs):
-    for item_ingredient in instance.itemingredients_set.all():
+    if (bool(instance.spoil_ingredient)):
         ingredient = get_object_or_404(
-            Ingredient, id=item_ingredient.ingredient_id)
-        update_ingredient_quantity(item_ingredient.quantity, ingredient)
+            Ingredient, id=instance.ingredient_id)
+        update_ingredient_quantity(-instance.quantity, ingredient)
 
 
-@receiver(pre_delete, sender=SpoilIngredient)
+@receiver(pre_delete, sender=ItemIngredients)
 def pre_delete_spoil_ingredient(sender, instance, **kwargs):
-    for item_ingredient in instance.itemingredients_set.all():
+    if (bool(instance.spoil_ingredient)):
         ingredient = get_object_or_404(
-            Ingredient, id=item_ingredient.ingredient_id)
-        update_ingredient_quantity(-item_ingredient.quantity, ingredient)
+            Ingredient, id=instance.ingredient_id)
+        update_ingredient_quantity(instance.quantity, ingredient)

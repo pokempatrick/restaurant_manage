@@ -23,7 +23,7 @@ class InventoriesListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Inventories
-        fields = ('id', 'total_price',
+        fields = ('id', 'total_price', 'total_lost',
                   'created_at', 'added_by', 'comment', 'statut')
 
 
@@ -36,6 +36,10 @@ class InventoriesDetailsSerializer(serializers.ModelSerializer):
     validations_set = ValidationSerializer(
         read_only=True, default=None, many=True)
     itemingredients_set = ItemIngredientsSerializer(many=True)
+    total_price = serializers.IntegerField(
+        read_only=True, default=None)
+    total_lost = serializers.IntegerField(
+        read_only=True, default=None)
 
     class Meta:
         model = Inventories

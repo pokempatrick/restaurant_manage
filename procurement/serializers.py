@@ -39,6 +39,8 @@ class ProcurementsDetailsSerializer(serializers.ModelSerializer):
     validations_set = ValidationSerializer(
         read_only=True, default=None, many=True)
     itemingredients_set = ItemIngredientsSerializer(many=True)
+    total_price = serializers.IntegerField(
+        read_only=True, default=None)
 
     class Meta:
         model = Procurements

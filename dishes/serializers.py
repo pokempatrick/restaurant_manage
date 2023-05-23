@@ -25,7 +25,7 @@ class DishDetailsSerializer(serializers.ModelSerializer):
 class DishRetrieveListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
-        fields = ('name', 'unit_price', 'created_at')
+        fields = ('id', 'name', 'unit_price', 'created_at')
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -49,7 +49,7 @@ class IngredientDetailsSerializer(serializers.ModelSerializer):
 class IngredientListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ('name', 'unit_price', 'created_at', 'group')
+        fields = ('id', 'name', 'unit_price', 'created_at', 'group')
 
 
 class ValidationSerializer(serializers.ModelSerializer):
@@ -68,6 +68,8 @@ class ValidationSerializer(serializers.ModelSerializer):
 class ItemIngredientsSerializer(serializers.ModelSerializer):
 
     id = serializers.IntegerField(required=False)
+    total_price = serializers.IntegerField(
+        read_only=True, default=None)
 
     class Meta:
         model = ItemIngredients
@@ -78,7 +80,7 @@ class ItemIngredientRootsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ItemIngredientRoots
-        fields = ('ingredient_name', 'quantity')
+        fields = ('id', 'ingredient_name', 'quantity')
 
 
 class ItemIngredientsSummarySerializer(serializers.ModelSerializer):

@@ -48,6 +48,7 @@ class DishResultDetailsSerializer(serializers.ModelSerializer):
         read_only=True, default=None, many=True)
     validations_set = ValidationSerializer(
         read_only=True, default=None, many=True)
+    total_price = serializers.IntegerField()
 
     class Meta:
         model = DishResult
@@ -63,6 +64,7 @@ class DishListResultDetailsSerializer(serializers.ModelSerializer):
     dish_result = DishResultSerializer(
         read_only=True, default=None)
     itemingredients_set = ItemIngredientsSerializer(many=True)
+    total_price = serializers.IntegerField()
 
     class Meta:
         model = DishListResult
